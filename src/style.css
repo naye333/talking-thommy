@@ -1,0 +1,22 @@
+/* ========================================= CONFIGURACIÓN GENERAL ========================================= */ 
+* {
+     margin: 0; 
+     padding: 0; 
+     box-sizing: border-box; 
+}
+
+body { 
+    font-family: Arial, Helvetica, sans-serif; 
+    background: #f5f7fb; 
+    min-height: 100vh; 
+}
+/* ========================================= CONTENEDOR PRINCIPAL ========================================= */ 
+
+.login-container {
+     width: 100%; 
+     min-height: 100vh; 
+     display: flex; 
+     justify-content: center; 
+     align-items: center; 
+     padding: 20px; 
+}
