@@ -20,3 +20,33 @@ body {
      align-items: center; 
      padding: 20px; 
 }
+
+/* ========================================= CAJA DEL LOGIN ========================================= */ 
+
+.login-box { 
+    width: 100%; 
+    max-width: 420px; 
+    background: #ffffff; 
+    padding: 45px 40px; 
+    border-radius: 20px; 
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08); 
+}
+
+/* ========================================= TÍTULO ========================================= */ 
+
+.login-box h1 {
+     text-align: center; 
+     font-size: 32px; 
+     color: #202938; 
+     margin-bottom: 10px; 
+} 
+
+/* ========================================= SUBTÍTULO ========================================= */
+
+.subtitle { 
+    text-align: center; 
+    color: #737b8c; 
+    font-size: 15px; 
+    margin-bottom: 35px; 
+    line-height: 1.5; 
+}
