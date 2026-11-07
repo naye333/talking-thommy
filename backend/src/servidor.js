@@ -23,8 +23,9 @@ async function detenerServidor ({ servidorHttp, servidorWs }) {
   await cerrarPool()
 }
 
-async function arrancar () {
-  const servidores = await iniciarServidor()
+// Inicia el servidor y registra el apagado ordenado con Ctrl + C o la señal de Render
+async function arrancar (puerto) {
+  const servidores = await iniciarServidor(puerto)
   const { port } = servidores.servidorHttp.address()
   console.log(`[servidor] REST en http://localhost:${port}/api`)
   console.log(`[servidor] WebSocket en ws://localhost:${port}/tiempo-real`)
@@ -39,6 +40,7 @@ async function arrancar () {
   }
   process.on('SIGINT', apagar)
   process.on('SIGTERM', apagar)
+  return { servidores, apagar }
 }
 
 if (require.main === module) {
@@ -48,4 +50,4 @@ if (require.main === module) {
   })
 }
 
-module.exports = { iniciarServidor, detenerServidor }
+module.exports = { iniciarServidor, detenerServidor, arrancar }

@@ -38,12 +38,14 @@ function manejarMensajeControl (socket, buffer, datos, contexto) {
         return enviarMensaje(socket, { tipo: 'error', codigo: 'AUDIO_VACIO' })
       }
       enviarMensaje(socket, { tipo: 'procesando' })
-      return procesarTurno(audio, contexto)
+      // La cadena termina en .catch: ningún error del procesamiento queda sin manejar
+      procesarTurno(audio, contexto)
         .then((resultado) => enviarMensaje(socket, resultado))
         .catch((error) => {
           console.error('[ws] error procesando turno:', error.message)
           enviarMensaje(socket, { tipo: 'error', codigo: 'ERROR_PROCESAMIENTO' })
         })
+      return
     }
 
     default:
