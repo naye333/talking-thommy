@@ -1,0 +1,27 @@
+# Mover este archivo a .github/workflows/ en la RAÍZ del repositorio.
+name: Backend CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+    paths: ['backend/**']
+  push:
+    branches: [develop, main]
+    paths: ['backend/**']
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
