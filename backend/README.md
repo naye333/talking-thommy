@@ -14,6 +14,7 @@ cd backend
 npm install
 cp .env.example .env      # luego pega tu DATABASE_URL de Neon
 npm run migrar            # crea las tablas en la base de datos
+npm run sembrar-syllabus  # carga el syllabus de Inglés I
 npm run dev
 ```
 
@@ -32,6 +33,7 @@ Verifica que todo esté arriba:
 | `npm run lint` | Revisa el estilo con StandardJS |
 | `npm run migrar` | Aplica las migraciones pendientes de `src/bd/migraciones` |
 | `npm run crear-docente -- correo "Nombre" "clave"` | Crea una cuenta de docente |
+| `npm run sembrar-syllabus [-- archivo.json]` | Carga o actualiza el syllabus (por defecto, Inglés I) |
 
 ## Autenticación
 
@@ -50,6 +52,20 @@ Las contraseñas se guardan cifradas con bcrypt y nunca se devuelven al cliente.
 ```js
 router.get('/curso', exigirToken, exigirRol('docente'), controlador)
 ```
+
+## Syllabus
+
+El contenido vive en `src/bd/semillas/syllabus-ingles-1.json`, tomado de la planeación oficial de Inglés I (A1, 2026-2): 3 cortes y 10 temas. Según el Acta, no se edita desde la app: para cambiarlo se modifica el JSON y se vuelve a ejecutar `npm run sembrar-syllabus` (actualiza sin duplicar). Para Inglés II, crea `syllabus-ingles-2.json` con la misma estructura y `"nivel": 2`.
+
+> El vocabulario y las frases modelo de cada tema son una propuesta del equipo, pendiente de validación por el profesor.
+
+| Método | Ruta | Respuesta |
+|---|---|---|
+| GET | `/api/syllabus` | `{ nivel, unidades: [{ id, numero, titulo, descripcion, temas: [{ id, numero, semana, titulo }] }] }` |
+| GET | `/api/syllabus?nivel=2` | Igual, para otro nivel (obligatorio para docentes) |
+| GET | `/api/syllabus/temas/:id` | `{ tema: { id, nivel, semana, titulo, objetivo, gramatica, vocabulario, frasesModelo, ... } }` |
+
+Todas exigen `Authorization: Bearer <token>`. Si un estudiante no envía `?nivel`, se usa el de su cuenta. Errores: `DATOS_INVALIDOS` (400), `TEMA_NO_ENCONTRADO` (404).
 
 ## Protocolo WebSocket
 

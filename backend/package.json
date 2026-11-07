@@ -9,7 +9,8 @@
     "test": "jest --coverage",
     "lint": "standard",
     "migrar": "node src/bd/migrar.js",
-    "crear-docente": "node src/bd/crearDocente.js"
+    "crear-docente": "node src/bd/crearDocente.js",
+    "sembrar-syllabus": "node src/bd/sembrarSyllabus.js"
   },
   "engines": {
     "node": ">=20"
