@@ -23,15 +23,28 @@ async function detenerServidor ({ servidorHttp, servidorWs }) {
   await cerrarPool()
 }
 
-if (require.main === module) {
-  iniciarServidor().then((servidores) => {
-    const { port } = servidores.servidorHttp.address()
-    console.log(`[servidor] REST en http://localhost:${port}/api`)
-    console.log(`[servidor] WebSocket en ws://localhost:${port}/tiempo-real`)
+async function arrancar () {
+  const servidores = await iniciarServidor()
+  const { port } = servidores.servidorHttp.address()
+  console.log(`[servidor] REST en http://localhost:${port}/api`)
+  console.log(`[servidor] WebSocket en ws://localhost:${port}/tiempo-real`)
 
-    const apagar = () => detenerServidor(servidores).then(() => process.exit(0))
-    process.on('SIGINT', apagar)
-    process.on('SIGTERM', apagar)
+  const apagar = () => {
+    detenerServidor(servidores)
+      .then(() => process.exit(0))
+      .catch((error) => {
+        console.error('[servidor] error al apagar:', error.message)
+        process.exit(1)
+      })
+  }
+  process.on('SIGINT', apagar)
+  process.on('SIGTERM', apagar)
+}
+
+if (require.main === module) {
+  arrancar().catch((error) => {
+    console.error('[servidor] no se pudo iniciar:', error.message)
+    process.exit(1)
   })
 }
 
