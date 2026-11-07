@@ -7,16 +7,20 @@
     "start": "node src/servidor.js",
     "dev": "node --watch src/servidor.js",
     "test": "jest --coverage",
-    "lint": "standard"
+    "lint": "standard",
+    "migrar": "node src/bd/migrar.js",
+    "crear-docente": "node src/bd/crearDocente.js"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.13.0",
     "ws": "^8.18.0"
   },

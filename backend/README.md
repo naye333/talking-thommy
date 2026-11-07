@@ -13,13 +13,14 @@ API REST y servidor WebSocket del tutor conversacional. Node.js + Express + ws +
 cd backend
 npm install
 cp .env.example .env      # luego pega tu DATABASE_URL de Neon
+npm run migrar            # crea las tablas en la base de datos
 npm run dev
 ```
 
 Verifica que todo esté arriba:
 
 - REST: http://localhost:3000/api/salud
-- WebSocket: `ws://localhost:3000/tiempo-real?sesion=ID`
+- WebSocket: `ws://localhost:3000/tiempo-real?sesion=ID&token=JWT`
 
 ## Scripts
 
@@ -29,10 +30,30 @@ Verifica que todo esté arriba:
 | `npm start` | Arranca en modo normal (Render usa este) |
 | `npm test` | Pruebas con cobertura (mínimo 80 % de líneas) |
 | `npm run lint` | Revisa el estilo con StandardJS |
+| `npm run migrar` | Aplica las migraciones pendientes de `src/bd/migraciones` |
+| `npm run crear-docente -- correo "Nombre" "clave"` | Crea una cuenta de docente |
+
+## Autenticación
+
+El registro público crea solo **estudiantes**. Las cuentas de docente se crean con `npm run crear-docente`.
+
+| Método | Ruta | Cuerpo | Respuesta |
+|---|---|---|---|
+| POST | `/api/auth/registro` | `{ nombre, correo, contrasena, nivel }` (nivel 1 o 2) | `201 { token, usuario }` |
+| POST | `/api/auth/ingreso` | `{ correo, contrasena }` | `200 { token, usuario }` |
+| GET | `/api/auth/yo` | — (encabezado `Authorization: Bearer <token>`) | `200 { usuario }` |
+
+Códigos de error: `DATOS_INVALIDOS` (400, con `detalles` por campo), `JSON_INVALIDO` (400), `CREDENCIALES_INVALIDAS` (401), `TOKEN_REQUERIDO` (401), `TOKEN_INVALIDO` (401), `PERMISO_DENEGADO` (403), `USUARIO_NO_ENCONTRADO` (404), `CORREO_EN_USO` (409), `BASE_DATOS_NO_DISPONIBLE` (503).
+
+Las contraseñas se guardan cifradas con bcrypt y nunca se devuelven al cliente. Para proteger una ruta:
+
+```js
+router.get('/curso', exigirToken, exigirRol('docente'), controlador)
+```
 
 ## Protocolo WebSocket
 
-Conexión: `/tiempo-real?sesion=<id>&token=<jwt>` (el token se valida a partir de `feature/autenticacion`).
+Conexión: `/tiempo-real?sesion=<id>&token=<jwt>`. Sin un token válido el servidor responde `TOKEN_INVALIDO` y cierra la conexión.
 
 | Dirección | Mensaje | Significado |
 |---|---|---|
@@ -44,7 +65,7 @@ Conexión: `/tiempo-real?sesion=<id>&token=<jwt>` (el token se valida a partir d
 | servidor → cliente | `{ "tipo": "turno_recibido", "bytes" }` | Temporal: luego será transcripción, retroalimentación y respuesta del tutor |
 | servidor → cliente | `{ "tipo": "error", "codigo" }` | Ver códigos abajo |
 
-Códigos de error: `SESION_REQUERIDA`, `JSON_INVALIDO`, `TIPO_DESCONOCIDO`, `TURNO_NO_INICIADO`, `AUDIO_VACIO`, `AUDIO_DEMASIADO_GRANDE`, `ERROR_PROCESAMIENTO`.
+Códigos de error: `TOKEN_INVALIDO`, `SESION_REQUERIDA`, `JSON_INVALIDO`, `TIPO_DESCONOCIDO`, `TURNO_NO_INICIADO`, `AUDIO_VACIO`, `AUDIO_DEMASIADO_GRANDE`, `ERROR_PROCESAMIENTO`.
 
 ## Estructura
 
@@ -62,6 +83,6 @@ pruebas/                    # Jest + supertest
 
 1. New → Web Service → conectar el repositorio.
 2. Root directory: `backend` · Build: `npm install` · Start: `npm start`.
-3. Variables de entorno: `DATABASE_URL`, `ORIGENES_PERMITIDOS`.
+3. Variables de entorno: `DATABASE_URL`, `ORIGENES_PERMITIDOS`, `JWT_SECRETO` y `ENTORNO=produccion`.
 
 El plan gratuito se duerme tras 15 minutos sin uso; abre `/api/salud` un minuto antes de una demo.
