@@ -4,6 +4,7 @@ import { crearPantallaListaEstudiantes } from './pantallas/listaEstudiantes.js'
 import { pantallaReporte } from './pantallas/reporte.js'
 import { pantallaFalencias } from './pantallas/falencias.js'
 import { pantallaDetalleReporte } from './pantallas/detalleReporte.js'
+import { pantallaAcciones } from './pantallas/acciones.js'
 import { crearPantallaCuenta } from '../comun/pantallas/cuenta.js'
 import { navegacionDocente, RUTAS_DOCENTE } from './navegacion.js'
 
@@ -19,6 +20,7 @@ export function crearRutasDocente (app) {
     ruta('/docente/estudiantes/:id/reporte', pantallaReporte),
     ruta('/docente/estudiantes/:id/falencias', pantallaFalencias),
     ruta('/docente/estudiantes/:id/detalle', pantallaDetalleReporte),
+    ruta('/docente/estudiantes/:id/acciones', pantallaAcciones),
     ruta('/docente/configuracion', pantallaCuentaDocente)
   ]
 }
