@@ -1,0 +1,205 @@
+/* =========================================================================
+   PANTALLAS COMUNES (ingreso, cuenta) Y DEL PERFIL DOCENTE
+   ========================================================================= */
+
+/* ---------- Ingreso ---------- */
+.pantalla-ingreso .pantalla__contenido {
+  justify-content: center;
+  gap: var(--espacio-4);
+  padding-top: var(--espacio-6);
+}
+
+.pantalla-ingreso__mascota {
+  align-self: center;
+  width: min(78%, 280px);
+}
+
+.pantalla-ingreso__textos {
+  text-align: center;
+}
+
+.pantalla-ingreso__titulo {
+  font-size: var(--texto-3xl);
+  font-weight: 700;
+}
+
+.pantalla-ingreso__subtitulo {
+  margin-top: var(--espacio-1);
+  color: var(--color-texto-suave);
+}
+
+.pantalla-ingreso__formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+.pantalla-ingreso__formulario .boton-principal {
+  margin-top: var(--espacio-2);
+}
+
+/* ---------- Cuenta ---------- */
+.cuenta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-3);
+  padding: var(--espacio-6) var(--espacio-4);
+}
+
+.cuenta__avatar {
+  width: 84px;
+  height: 84px;
+}
+
+.cuenta__nombre {
+  font-size: var(--texto-xl);
+  font-weight: 700;
+  text-align: center;
+}
+
+.cuenta__datos {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+.cuenta__dato {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--espacio-3);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.cuenta__dato dt {
+  color: var(--color-texto-suave);
+}
+
+.cuenta__dato dd {
+  font-weight: 500;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.cuenta__aviso {
+  font-size: var(--texto-sm);
+  color: var(--color-alerta);
+  text-align: center;
+}
+
+.boton-cerrar-sesion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-2);
+  min-height: 50px;
+  border-radius: var(--radio-pildora);
+  border: 1px solid rgba(255, 107, 138, 0.5);
+  color: var(--color-peligro);
+  font-weight: 500;
+}
+
+/* ---------- Inicio del docente ---------- */
+.inicio-docente__barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top, 0px) + 14px) calc(var(--margen-pantalla) - 8px) 0;
+}
+
+.inicio-docente__barra .boton-icono .icono {
+  width: 30px;
+  height: 30px;
+}
+
+.inicio-docente__acciones {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+}
+
+.inicio-docente__perfil .icono {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
+}
+
+.inicio-docente .pantalla__contenido {
+  gap: 0;
+  padding-top: var(--espacio-1);
+}
+
+.inicio-docente__saludo {
+  position: relative;
+  padding-right: 64px;
+}
+
+.inicio-docente__titulo {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  font-size: var(--texto-3xl);
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.inicio-docente__corazon {
+  width: 26px;
+  height: 26px;
+  color: var(--color-lima);
+}
+
+.inicio-docente__texto {
+  margin-top: var(--espacio-1);
+  max-width: 260px;
+  font-size: var(--texto-lg);
+  line-height: 1.3;
+  color: var(--color-texto-suave);
+}
+
+.inicio-docente__huella {
+  position: absolute;
+  top: 46px;
+  right: 6px;
+  width: 42px;
+  height: 42px;
+  color: var(--color-lima-oscuro);
+  opacity: 0.75;
+  transform: rotate(18deg);
+}
+
+.inicio-docente__escena {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin: 2px calc(var(--margen-pantalla) * -1) 0;
+}
+
+.inicio-docente__mascota {
+  width: min(88%, 340px);
+}
+
+.inicio-docente__accesos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--espacio-3);
+  margin-top: var(--espacio-1);
+}
+
+.inicio-docente__accesos .tarjeta-acceso {
+  min-height: 118px;
+}
+
+/* La segunda fila (Alertas, Configuración) es más baja y con el icono de trazo */
+.inicio-docente__accesos .tarjeta-acceso:nth-child(n + 3) {
+  min-height: 86px;
+  font-size: var(--texto-md);
+}
+
+.inicio-docente__accesos .tarjeta-acceso:nth-child(n + 3) .tarjeta-acceso__icono {
+  width: 30px;
+  height: 30px;
+}

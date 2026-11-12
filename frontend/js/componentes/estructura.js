@@ -34,10 +34,10 @@ export function barraNavegacion ({ elementos, activo }) {
 function decoracionHojas () {
   return html`
     <svg class="decoracion-hojas" viewBox="0 0 390 220" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M-20 220C-8 150 40 112 96 104c-20 30-26 66-12 116z" fill="var(--color-hoja)"/>
-      <path d="M-30 160c30-46 78-62 124-56-36 18-62 50-70 96z" fill="var(--color-hoja-clara)" opacity=".55"/>
-      <path d="M410 220c-10-74-58-118-120-126 22 34 30 78 18 126z" fill="var(--color-hoja)"/>
-      <path d="M420 150c-28-40-74-54-118-46 34 16 58 46 66 86z" fill="var(--color-hoja-clara)" opacity=".5"/>
+      <path d="M-20 220C-12 168 22 136 70 124c-14 28-18 60-8 96z" fill="var(--color-hoja)"/>
+      <path d="M-30 176c22-36 58-50 94-48-28 16-46 42-52 76z" fill="var(--color-hoja-clara)" opacity=".5"/>
+      <path d="M410 220c-8-56-42-90-90-100 16 30 20 66 12 100z" fill="var(--color-hoja)"/>
+      <path d="M420 170c-22-32-56-44-90-40 26 14 42 38 48 70z" fill="var(--color-hoja-clara)" opacity=".45"/>
     </svg>`
 }
 
