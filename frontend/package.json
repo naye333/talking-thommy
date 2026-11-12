@@ -1,14 +1,24 @@
 {
   "name": "talking-thommy-frontend",
   "version": "0.1.0",
-  "description": "Frontend web de Talking Thommy (HTML, CSS y JavaScript sin dependencias)",
+  "description": "App móvil de Talking Thommy (HTML, CSS y JavaScript empaquetados con Capacitor)",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "node servidor-dev.js",
-    "test": "node pruebas/ejecutar.js"
+    "test": "node pruebas/ejecutar.js",
+    "build": "node scripts/preparar-web.js",
+    "sync": "npm run build && cap sync",
+    "android": "npm run sync && cap open android"
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0"
   }
 }
