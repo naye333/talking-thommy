@@ -1,0 +1,14 @@
+{
+  "name": "talking-thommy-frontend",
+  "version": "0.1.0",
+  "description": "Frontend web de Talking Thommy (HTML, CSS y JavaScript sin dependencias)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node servidor-dev.js",
+    "test": "node pruebas/ejecutar.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
