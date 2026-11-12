@@ -39,7 +39,7 @@ function tarjetaPromedio ({ promedioGeneral, variacion, periodo }) {
           <strong class="promedio__porcentaje">${promedioGeneral}%</strong>
         </div>
         <div class="promedio__variacion${esBaja ? ' promedio__variacion--baja' : ''}">
-          ${icono('tendencia', { clase: 'promedio__tendencia' })}
+          ${icono(esBaja ? 'tendenciaBaja' : 'tendencia', { clase: 'promedio__tendencia' })}
           <strong class="promedio__cambio">${formatearVariacion(variacion)}</strong>
           <span class="promedio__comparacion">${obtenerPeriodo(periodo).comparacion}</span>
         </div>

@@ -391,9 +391,11 @@
 }
 
 .promedio__comparacion {
+  max-width: 96px;
   font-size: var(--texto-xs);
+  line-height: 1.2;
+  text-align: center;
   color: var(--color-texto-suave);
-  white-space: nowrap;
 }
 
 .promedio__variacion--baja {
@@ -506,4 +508,29 @@
 
 .falencias__boton {
   margin-top: var(--espacio-2);
+}
+
+/* ---------- Detalle del reporte ---------- */
+.evolucion {
+  padding: var(--espacio-4) var(--espacio-4) var(--espacio-2);
+}
+
+.evolucion__titulo {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  font-size: var(--texto-md);
+  font-weight: 500;
+}
+
+.evolucion__icono {
+  width: 24px;
+  height: 24px;
+  color: var(--color-lima);
+}
+
+.evolucion__subtitulo {
+  margin: 2px 0 var(--espacio-2) 36px;
+  font-size: var(--texto-xs);
+  color: var(--color-texto-tenue);
 }
