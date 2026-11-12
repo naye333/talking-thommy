@@ -11,12 +11,12 @@ export function estadoCargando (texto = 'Cargando…') {
     </div>`
 }
 
-export function estadoError (mensaje) {
+export function estadoError (mensaje, { conReintento = true } = {}) {
   return html`
     <div class="estado estado--error" role="alert">
       ${icono('alertaRoja', { clase: 'estado__icono' })}
       <p class="estado__texto">${mensaje}</p>
-      <button class="boton-secundario" type="button" data-accion="reintentar">Reintentar</button>
+      ${conReintento ? html`<button class="boton-secundario" type="button" data-accion="reintentar">Reintentar</button>` : ''}
     </div>`
 }
 
@@ -39,8 +39,10 @@ export async function cargarRegion (region, { cargar, mostrar, alMostrar, textoC
     if (alMostrar) alMostrar(datos, region)
   } catch (error) {
     if (!region.isConnected) return
-    renderizar(region, estadoError(obtenerMensajeError(error)))
-    region.querySelector('[data-accion="reintentar"]').addEventListener('click', () => {
+    // Reintentar no sirve si el recurso no existe o el servicio aún no está implementado
+    const conReintento = ![404, 501].includes(error.estado)
+    renderizar(region, estadoError(obtenerMensajeError(error), { conReintento }))
+    region.querySelector('[data-accion="reintentar"]')?.addEventListener('click', () => {
       cargarRegion(region, { cargar, mostrar, alMostrar, textoCargando })
     }, { once: true })
   }

@@ -1,6 +1,8 @@
 // Rutas del perfil docente. Todas exigen una sesión con rol "docente".
 import { pantallaInicioDocente } from './pantallas/inicio.js'
 import { crearPantallaListaEstudiantes } from './pantallas/listaEstudiantes.js'
+import { pantallaReporte } from './pantallas/reporte.js'
+import { pantallaFalencias } from './pantallas/falencias.js'
 import { crearPantallaCuenta } from '../comun/pantallas/cuenta.js'
 import { navegacionDocente, RUTAS_DOCENTE } from './navegacion.js'
 
@@ -13,6 +15,8 @@ export function crearRutasDocente (app) {
     ruta('/docente/estudiantes', crearPantallaListaEstudiantes('estudiantes')),
     ruta('/docente/reportes', crearPantallaListaEstudiantes('reportes')),
     ruta('/docente/alertas', crearPantallaListaEstudiantes('alertas')),
+    ruta('/docente/estudiantes/:id/reporte', pantallaReporte),
+    ruta('/docente/estudiantes/:id/falencias', pantallaFalencias),
     ruta('/docente/configuracion', pantallaCuentaDocente)
   ]
 }

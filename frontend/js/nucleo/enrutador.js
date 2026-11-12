@@ -39,6 +39,18 @@ export function resolverRuta (rutas, ruta) {
   return null
 }
 
+// Arma '/ruta?clave=valor' omitiendo valores vacíos
+export function construirRuta (ruta, query = {}) {
+  const parametros = new URLSearchParams(Object.entries(query).filter(([, valor]) => valor !== undefined && valor !== null && valor !== ''))
+  const cadena = parametros.toString()
+  return cadena ? `${ruta}?${cadena}` : ruta
+}
+
+// Cambia la query del hash sin volver a montar la pantalla (por ejemplo, al elegir un periodo)
+export function reemplazarQuery (ruta, query, ventana = window) {
+  ventana.history.replaceState(null, '', `#${construirRuta(ruta, query)}`)
+}
+
 export function prepararRutas (rutas) {
   return rutas.map((definicion) => ({ ...definicion, compilado: compilarPatron(definicion.patron) }))
 }

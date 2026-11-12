@@ -174,14 +174,16 @@
   height: 26px;
 }
 
+/* El icono y el texto quedan centrados juntos; la flecha va al borde derecho */
 .boton-principal__flecha {
-  margin-left: auto;
+  position: absolute;
+  right: 20px;
   width: 22px;
   height: 22px;
 }
 
-.boton-principal:has(.boton-principal__flecha) .boton-principal__texto {
-  margin-left: auto;
+.boton-principal {
+  position: relative;
 }
 
 .boton-principal[disabled] {

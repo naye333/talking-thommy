@@ -230,3 +230,280 @@
   width: 24px;
   height: 24px;
 }
+
+/* ---------- Títulos de sección y selector de periodo ---------- */
+.titulo-seccion {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  margin-top: var(--espacio-2);
+  font-size: var(--texto-lg);
+  font-weight: 500;
+}
+
+.titulo-seccion__icono {
+  width: 26px;
+  height: 26px;
+  color: var(--color-lima);
+}
+
+.selector-pildora {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  margin-top: 6px;
+  border-radius: var(--radio-pildora);
+  border: 1.5px solid var(--color-borde-fuerte);
+  background: rgba(166, 227, 95, 0.1);
+}
+
+.selector-pildora__campo {
+  appearance: none;
+  padding: 6px 30px 6px 12px;
+  border: none;
+  background: transparent;
+  font-size: var(--texto-xs);
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+}
+
+.selector-pildora__campo option {
+  background: var(--color-superficie-solida);
+}
+
+.selector-pildora__icono {
+  position: absolute;
+  right: 10px;
+  width: 15px;
+  height: 15px;
+  pointer-events: none;
+}
+
+.selector-pildora:focus-within {
+  outline: 2px solid var(--color-lima);
+  outline-offset: 2px;
+}
+
+/* ---------- Reporte del estudiante ---------- */
+.reporte,
+.falencias,
+.detalle-reporte,
+.acciones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+
+.cabecera-estudiante {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espacio-3);
+  padding-top: var(--espacio-4);
+}
+
+.cabecera-estudiante__avatar {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.cabecera-estudiante__birrete {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  width: 54px;
+  height: 54px;
+  color: var(--color-lima-oscuro);
+  transform: translateX(-50%) rotate(-8deg);
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+}
+
+.cabecera-estudiante__textos {
+  flex: 1;
+  min-width: 0;
+  padding-top: 18px;
+}
+
+.cabecera-estudiante__nombre {
+  font-size: var(--texto-lg);
+  font-weight: 500;
+}
+
+.cabecera-estudiante__nivel {
+  margin-top: 4px;
+  font-size: var(--texto-md);
+  color: var(--color-texto-suave);
+}
+
+.promedio {
+  padding: var(--espacio-4);
+}
+
+.promedio__titulo {
+  font-size: var(--texto-md);
+  font-weight: 500;
+}
+
+.promedio__cuerpo {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-4);
+  margin-top: var(--espacio-2);
+}
+
+.promedio__valor {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.promedio__etiqueta {
+  font-size: var(--texto-sm);
+  color: var(--color-texto-suave);
+}
+
+.promedio__porcentaje {
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.promedio__variacion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-left: var(--espacio-4);
+  border-left: 1px solid var(--color-borde);
+  color: var(--color-lima);
+}
+
+.promedio__tendencia {
+  width: 38px;
+  height: 38px;
+}
+
+.promedio__cambio {
+  font-size: var(--texto-2xl);
+  font-weight: 700;
+  color: var(--color-texto);
+}
+
+.promedio__comparacion {
+  font-size: var(--texto-xs);
+  color: var(--color-texto-suave);
+  white-space: nowrap;
+}
+
+.promedio__variacion--baja {
+  color: var(--color-peligro);
+}
+
+.cuadricula-areas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--espacio-3);
+}
+
+.tarjeta-area {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--espacio-4);
+}
+
+.tarjeta-area__nombre {
+  font-size: var(--texto-md);
+  font-weight: 400;
+}
+
+.tarjeta-area__valor {
+  margin-bottom: 6px;
+  font-size: var(--texto-xl);
+  font-weight: 700;
+}
+
+.reporte__enlaces {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: var(--espacio-2);
+}
+
+/* ---------- Falencias ---------- */
+.aviso-refuerzo {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-4);
+  padding: var(--espacio-4);
+  border-color: rgba(247, 196, 58, 0.28);
+}
+
+.aviso-refuerzo__icono {
+  width: 46px;
+  height: 46px;
+}
+
+.aviso-refuerzo__titulo {
+  font-size: var(--texto-lg);
+  font-weight: 500;
+}
+
+.aviso-refuerzo__texto {
+  margin-top: 2px;
+  font-size: var(--texto-sm);
+  color: var(--color-texto-suave);
+}
+
+.falencia {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espacio-4);
+  padding: var(--espacio-4);
+}
+
+.falencia__icono {
+  width: 48px;
+  height: 48px;
+  margin-top: 4px;
+}
+
+.falencia__textos {
+  flex: 1;
+  min-width: 0;
+}
+
+.falencia__cabecera {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+}
+
+.falencia__area {
+  font-size: var(--texto-md);
+  font-weight: 500;
+}
+
+.falencia__porcentaje {
+  font-size: var(--texto-md);
+  font-weight: 500;
+  color: var(--color-peligro);
+}
+
+.falencia__descripcion {
+  margin-top: 4px;
+  font-size: var(--texto-sm);
+  color: var(--color-texto-suave);
+}
+
+.falencia__tema {
+  margin-top: 6px;
+  font-size: var(--texto-xs);
+  color: var(--color-texto-tenue);
+}
+
+.falencias__boton {
+  margin-top: var(--espacio-2);
+}

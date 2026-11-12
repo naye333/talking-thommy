@@ -50,6 +50,19 @@ export function buscador ({ id, placeholder, valor = '' }) {
     </label>`
 }
 
+// Selector en forma de píldora (por ejemplo, "Último mes"). opciones: [{ valor, etiqueta }]
+export function selectorPildora ({ id, etiqueta, opciones, valor }) {
+  return html`
+    <label class="selector-pildora" for="${id}">
+      <span class="solo-lectores">${etiqueta}</span>
+      <select class="selector-pildora__campo" id="${id}">
+        ${opciones.map((opcion) => html`
+          <option value="${opcion.valor}" ${opcion.valor === valor ? html`selected` : ''}>${opcion.etiqueta}</option>`)}
+      </select>
+      ${icono('chevronAbajo', { clase: 'selector-pildora__icono' })}
+    </label>`
+}
+
 // Ilustraciones de Thommy. variante: 'docente' (con portátil) o 'animo' (asomándose)
 export function mascota ({ variante, clase = '' }) {
   return html`

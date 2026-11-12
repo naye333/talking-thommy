@@ -36,3 +36,11 @@ describir('enrutador', (prueba) => {
     afirmar.igual(resolverRuta(rutas, '/docente/estudiantes/1/2/reporte'), null)
   })
 })
+
+describir('enrutador › construirRuta', (prueba) => {
+  prueba('agrega la query omitiendo valores vacíos', async () => {
+    const { construirRuta } = await import('../../js/nucleo/enrutador.js')
+    afirmar.igual(construirRuta('/a', { periodo: 'semestre', vacio: '', nulo: null }), '/a?periodo=semestre')
+    afirmar.igual(construirRuta('/a'), '/a')
+  })
+})
