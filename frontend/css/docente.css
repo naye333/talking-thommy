@@ -203,3 +203,30 @@
   width: 30px;
   height: 30px;
 }
+
+/* ---------- Lista de estudiantes ---------- */
+.lista-estudiantes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lista-estudiantes__descripcion {
+  font-size: var(--texto-sm);
+  color: var(--color-texto-suave);
+}
+
+.insignia-promedio {
+  padding: 4px 10px;
+  border-radius: var(--radio-pildora);
+  background: rgba(166, 227, 95, 0.14);
+  border: 1px solid var(--color-borde-fuerte);
+  color: var(--color-lima);
+  font-weight: 700;
+  font-size: var(--texto-sm);
+}
+
+.fila-persona__alerta {
+  width: 24px;
+  height: 24px;
+}
