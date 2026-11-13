@@ -1,42 +1,6 @@
 /* =========================================================================
-   PANTALLAS COMUNES (ingreso, cuenta) Y DEL PERFIL DOCENTE
+   PANTALLAS COMUNES (cuenta) Y DEL PERFIL DOCENTE
    ========================================================================= */
-
-/* ---------- Ingreso ---------- */
-.pantalla-ingreso .pantalla__contenido {
-  justify-content: center;
-  gap: var(--espacio-4);
-  padding-top: var(--espacio-6);
-}
-
-.pantalla-ingreso__mascota {
-  align-self: center;
-  width: min(78%, 280px);
-}
-
-.pantalla-ingreso__textos {
-  text-align: center;
-}
-
-.pantalla-ingreso__titulo {
-  font-size: var(--texto-3xl);
-  font-weight: 700;
-}
-
-.pantalla-ingreso__subtitulo {
-  margin-top: var(--espacio-1);
-  color: var(--color-texto-suave);
-}
-
-.pantalla-ingreso__formulario {
-  display: flex;
-  flex-direction: column;
-  gap: var(--espacio-2);
-}
-
-.pantalla-ingreso__formulario .boton-principal {
-  margin-top: var(--espacio-2);
-}
 
 /* ---------- Cuenta ---------- */
 .cuenta {

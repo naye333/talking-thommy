@@ -4,24 +4,27 @@ import { html } from '../nucleo/dom.js'
 import { icono } from './iconos.js'
 
 // rutaAtras: a dónde volver si la pantalla se abrió directamente por URL
-export function encabezado ({ titulo, rutaAtras = null }) {
+// complemento: acción opcional a la derecha (por ejemplo, un botón)
+export function encabezado ({ titulo, rutaAtras = null, complemento = '' }) {
   return html`
     <header class="encabezado">
       ${rutaAtras
         ? html`<button class="encabezado__atras" type="button" data-accion="atras" data-ruta-atras="${rutaAtras}" aria-label="Volver">${icono('chevronIzquierda')}</button>`
         : ''}
       <h1 class="encabezado__titulo">${titulo}</h1>
+      ${complemento ? html`<div class="encabezado__complemento">${complemento}</div>` : ''}
     </header>`
 }
 
-// elementos: [{ id, etiqueta, icono, ruta }]
+// elementos: [{ id, etiqueta, icono, ruta, destacado? }]. "destacado" lo muestra como botón central elevado.
 export function barraNavegacion ({ elementos, activo }) {
   return html`
-    <nav class="barra-navegacion" aria-label="Navegación principal">
+    <nav class="barra-navegacion" aria-label="Navegación principal" style="grid-template-columns: repeat(${elementos.length}, 1fr)">
       ${elementos.map((elemento) => {
         const esActivo = elemento.id === activo
+        const clases = `barra-navegacion__elemento${esActivo ? ' barra-navegacion__elemento--activo' : ''}${elemento.destacado ? ' barra-navegacion__elemento--destacado' : ''}`
         return html`
-          <a class="barra-navegacion__elemento${esActivo ? ' barra-navegacion__elemento--activo' : ''}"
+          <a class="${clases}"
              href="#${elemento.ruta}" ${esActivo ? html`aria-current="page"` : ''}>
             ${icono(elemento.icono, { clase: 'barra-navegacion__icono' })}
             <span>${elemento.etiqueta}</span>

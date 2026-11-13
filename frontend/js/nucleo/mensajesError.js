@@ -16,6 +16,14 @@ const MENSAJES = {
   SERVICIO_NO_DISPONIBLE: 'Esta función todavía no está disponible.',
   RUTA_NO_ENCONTRADA: 'Esta función todavía no está disponible en el servidor.',
   SIN_CONEXION: 'No pudimos conectar con el servidor. Revisa tu conexión.',
+  MICROFONO_DENEGADO: 'Necesitamos permiso para usar el micrófono. Actívalo en la configuración del dispositivo.',
+  MICROFONO_NO_ENCONTRADO: 'No encontramos un micrófono en este dispositivo.',
+  MICROFONO_NO_DISPONIBLE: 'El micrófono no está disponible en este dispositivo.',
+  AUDIO_VACIO: 'No escuchamos nada. Mantén el micrófono cerca e inténtalo de nuevo.',
+  AUDIO_DEMASIADO_GRANDE: 'La grabación es muy larga. Intenta con una frase más corta.',
+  TUTOR_NO_DISPONIBLE: 'Thommy todavía no puede responder desde el servidor. Intenta más tarde.',
+  SESION_REQUERIDA: 'No se pudo iniciar la conversación. Intenta de nuevo.',
+  ERROR_PROCESAMIENTO: 'Thommy no pudo procesar tu audio. Intenta de nuevo.',
   ERROR_INTERNO: 'Ocurrió un error inesperado. Intenta de nuevo.'
 }
 

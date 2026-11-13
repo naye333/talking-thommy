@@ -66,3 +66,13 @@ describir('sesion', (prueba) => {
     afirmar.igual(almacen.leer('clave'), 'valor')
   })
 })
+
+describir('sesion › rol', (prueba) => {
+  prueba('el rol del token prevalece sobre el del usuario guardado', () => {
+    const base64Url = (objeto) => btoa(JSON.stringify(objeto)).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_')
+    const sesion = crearSesion({ almacen: crearAlmacenSeguro(() => null) })
+    sesion.guardar({ token: `${base64Url({})}.${base64Url({ sub: '9', rol: 'estudiante' })}.f`, usuario: { id: 9, nombre: 'Ana', rol: 'docente' } })
+    afirmar.igual(sesion.obtenerUsuario().rol, 'estudiante')
+    afirmar.igual(sesion.obtenerUsuario().nombre, 'Ana')
+  })
+})

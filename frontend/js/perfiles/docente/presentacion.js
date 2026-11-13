@@ -11,8 +11,3 @@ export const ICONO_POR_AREA = {
   fluidez: 'engranajeColor',
   pronunciacion: 'exclamacion'
 }
-
-export function formatearVariacion (variacion) {
-  const numero = Math.round(Number(variacion) || 0)
-  return `${numero > 0 ? '+' : ''}${numero}%`
-}

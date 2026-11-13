@@ -3,9 +3,7 @@ import { html, renderizar } from '../../../nucleo/dom.js'
 import { obtenerMensajeError, agruparDetallesPorCampo } from '../../../nucleo/mensajesError.js'
 import { plantillaPantalla } from '../../../componentes/estructura.js'
 import { mascota } from '../../../componentes/elementos.js'
-
-// Misma regla que el backend (validacionesAutenticacion.js)
-const EXPRESION_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+import { campoConIcono, prepararFormulario, EXPRESION_CORREO } from '../formularios.js'
 
 export function validarFormularioIngreso ({ correo, contrasena }) {
   const errores = {}
@@ -15,45 +13,27 @@ export function validarFormularioIngreso ({ correo, contrasena }) {
   return errores
 }
 
-function campo ({ id, nombre, etiqueta, tipo, placeholder, autocompletar }) {
-  return html`
-    <div class="campo">
-      <label class="campo__etiqueta" for="${id}">${etiqueta}</label>
-      <input class="campo__entrada" id="${id}" name="${nombre}" type="${tipo}" placeholder="${placeholder}"
-             autocomplete="${autocompletar}" aria-describedby="${id}-error">
-      <p class="campo__error" id="${id}-error" data-error-de="${nombre}"></p>
-    </div>`
-}
-
 export function pantallaIngreso ({ contenedor, navegar }, app) {
   renderizar(contenedor, plantillaPantalla({
-    clase: 'pantalla--sin-navegacion pantalla-ingreso',
+    clase: 'pantalla--sin-navegacion pantalla-acceso',
     contenido: html`
-      ${mascota({ variante: 'docente', clase: 'pantalla-ingreso__mascota' })}
-      <div class="pantalla-ingreso__textos">
-        <h1 class="pantalla-ingreso__titulo">Talking Thommy</h1>
-        <p class="pantalla-ingreso__subtitulo">Practica inglés con Thommy, tu tutor con IA</p>
+      ${mascota({ variante: 'bienvenida', clase: 'pantalla-acceso__mascota' })}
+      <div class="pantalla-acceso__textos">
+        <h1 class="pantalla-acceso__titulo">¡Bienvenido de nuevo!</h1>
+        <p class="pantalla-acceso__subtitulo">Inicia sesión para continuar</p>
       </div>
-      <form class="pantalla-ingreso__formulario" novalidate>
-        ${campo({ id: 'ingreso-correo', nombre: 'correo', etiqueta: 'Correo electrónico', tipo: 'email', placeholder: 'tu@correo.com', autocompletar: 'email' })}
-        ${campo({ id: 'ingreso-contrasena', nombre: 'contrasena', etiqueta: 'Contraseña', tipo: 'password', placeholder: 'Tu contraseña', autocompletar: 'current-password' })}
+      <form class="pantalla-acceso__formulario" novalidate>
+        ${campoConIcono({ id: 'ingreso-correo', nombre: 'correo', etiqueta: 'Correo electrónico', tipo: 'email', iconoNombre: 'sobre', autocompletar: 'email' })}
+        ${campoConIcono({ id: 'ingreso-contrasena', nombre: 'contrasena', etiqueta: 'Contraseña', tipo: 'password', iconoNombre: 'candado', autocompletar: 'current-password' })}
         <p class="mensaje-error" role="alert" data-mensaje-general></p>
         <button class="boton-principal" type="submit">Iniciar sesión</button>
-      </form>`
+      </form>
+      <p class="pantalla-acceso__alterno">¿No tienes cuenta? <a href="#/registro">Regístrate</a></p>`
   }))
 
   const formulario = contenedor.querySelector('form')
   const boton = formulario.querySelector('button[type="submit"]')
-  const mensajeGeneral = formulario.querySelector('[data-mensaje-general]')
-
-  function mostrarErrores (porCampo, general = '') {
-    for (const parrafo of formulario.querySelectorAll('[data-error-de]')) {
-      const nombre = parrafo.dataset.errorDe
-      parrafo.textContent = porCampo[nombre] || ''
-      formulario.elements[nombre].setAttribute('aria-invalid', porCampo[nombre] ? 'true' : 'false')
-    }
-    mensajeGeneral.textContent = general
-  }
+  const mostrarErrores = prepararFormulario(formulario)
 
   formulario.addEventListener('submit', async (evento) => {
     evento.preventDefault()

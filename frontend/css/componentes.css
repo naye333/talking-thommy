@@ -690,3 +690,188 @@
 .mensaje-error:empty {
   display: none;
 }
+
+/* ---------- Encabezado: acción a la derecha ---------- */
+.encabezado__complemento {
+  grid-column: 3;
+  justify-self: end;
+}
+
+/* ---------- Barra inferior: botón central destacado ---------- */
+.barra-navegacion__elemento--destacado {
+  position: relative;
+  color: var(--color-lima);
+  font-weight: 500;
+}
+
+.barra-navegacion__elemento--destacado .barra-navegacion__icono {
+  box-sizing: content-box;
+  width: 28px;
+  height: 28px;
+  margin-top: -30px;
+  padding: 14px;
+  border-radius: 50%;
+  background: var(--degradado-lima);
+  color: var(--color-sobre-lima);
+  box-shadow: 0 0 0 5px var(--color-fondo-app), var(--sombra-lima);
+}
+
+/* ---------- Marca Talking Thommy ---------- */
+.marca {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.5px;
+}
+
+.marca__linea {
+  font-size: 2.6rem;
+}
+
+.marca__linea--lima {
+  font-size: 3.1rem;
+  color: var(--color-lima);
+}
+
+/* ---------- Pantalla de bienvenida ---------- */
+.bienvenida {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-3);
+  padding: var(--espacio-6);
+  background:
+    radial-gradient(ellipse 90% 50% at 50% 20%, var(--color-fondo-brillo) 0%, transparent 70%),
+    var(--color-fondo-app);
+  transition: opacity 400ms ease;
+}
+
+.bienvenida--saliendo {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bienvenida__mascota {
+  width: min(70%, 260px);
+  height: auto;
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%);
+}
+
+.bienvenida__lema {
+  font-size: var(--texto-lg);
+  color: var(--color-texto-suave);
+}
+
+.bienvenida__barra {
+  width: min(60%, 220px);
+  height: 8px;
+  margin-top: var(--espacio-6);
+  border-radius: var(--radio-pildora);
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.bienvenida__barra span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--degradado-lima);
+  animation: cargar-bienvenida 1.1s ease-out forwards;
+}
+
+@keyframes cargar-bienvenida {
+  from { width: 8%; }
+  to { width: 100%; }
+}
+
+/* ---------- Campo con icono (ingreso y registro) ---------- */
+.campo-icono {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  min-height: 54px;
+  padding: 0 var(--espacio-4);
+  border-radius: var(--radio-md);
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+}
+
+.campo-icono:focus-within {
+  border-color: var(--color-borde-fuerte);
+}
+
+.campo-icono:has([aria-invalid="true"]) {
+  border-color: var(--color-peligro);
+}
+
+.campo-icono__icono {
+  width: 22px;
+  height: 22px;
+  color: var(--color-texto);
+}
+
+.campo-icono__entrada {
+  flex: 1;
+  min-width: 0;
+  min-height: 52px;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.campo-icono__entrada::placeholder {
+  color: var(--color-texto-suave);
+}
+
+.campo-icono__ver {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-right: -8px;
+  color: var(--color-texto-suave);
+}
+
+.campo-icono__ver .icono {
+  width: 22px;
+  height: 22px;
+}
+
+/* ---------- Botón de contorno ---------- */
+.boton-contorno {
+  width: 100%;
+  min-height: 50px;
+  border-radius: var(--radio-pildora);
+  border: 1.5px solid var(--color-borde-fuerte);
+  color: var(--color-texto);
+  font-size: var(--texto-lg);
+  font-weight: 500;
+}
+
+/* ---------- Pestañas ---------- */
+.pestanas {
+  display: flex;
+  gap: var(--espacio-2);
+}
+
+.pestanas__pestana {
+  padding: 8px 18px;
+  border-radius: var(--radio-pildora);
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  font-size: var(--texto-sm);
+  font-weight: 500;
+}
+
+.pestanas__pestana[aria-selected="true"] {
+  background: var(--degradado-lima);
+  color: var(--color-sobre-lima);
+  border-color: transparent;
+}

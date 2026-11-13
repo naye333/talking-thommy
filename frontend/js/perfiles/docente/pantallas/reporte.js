@@ -4,13 +4,13 @@ import { reemplazarQuery } from '../../../nucleo/enrutador.js'
 import { plantillaPantalla, encabezado } from '../../../componentes/estructura.js'
 import { avatar, selectorPildora, avisoDatosEjemplo } from '../../../componentes/elementos.js'
 import { enlaceSeccion } from '../../../componentes/tarjetas.js'
-import { anilloProgreso, barraProgreso } from '../../../componentes/graficos.js'
+import { tarjetaPromedio, cuadriculaAreas } from '../../../componentes/reportes.js'
 import { cargarRegion } from '../../../componentes/estados.js'
 import { icono } from '../../../componentes/iconos.js'
 import { PERIODOS, obtenerPeriodo } from '../../../servicios/docente/servicioDocente.js'
 import { navegacionDocente, RUTAS_DOCENTE } from '../navegacion.js'
 import { seleccionEstudiante } from '../estado.js'
-import { textoNivel, formatearVariacion } from '../presentacion.js'
+import { textoNivel } from '../presentacion.js'
 
 export function cabeceraEstudiante ({ estudiante, complemento = '' }) {
   return html`
@@ -25,35 +25,6 @@ export function cabeceraEstudiante ({ estudiante, complemento = '' }) {
       </div>
       ${complemento}
     </section>`
-}
-
-function tarjetaPromedio ({ promedioGeneral, variacion, periodo }) {
-  const esBaja = variacion < 0
-  return html`
-    <section class="tarjeta promedio">
-      <h2 class="promedio__titulo">Promedio General</h2>
-      <div class="promedio__cuerpo">
-        ${anilloProgreso({ valor: promedioGeneral, etiqueta: 'Promedio general' })}
-        <div class="promedio__valor">
-          <span class="promedio__etiqueta">Rendimiento</span>
-          <strong class="promedio__porcentaje">${promedioGeneral}%</strong>
-        </div>
-        <div class="promedio__variacion${esBaja ? ' promedio__variacion--baja' : ''}">
-          ${icono(esBaja ? 'tendenciaBaja' : 'tendencia', { clase: 'promedio__tendencia' })}
-          <strong class="promedio__cambio">${formatearVariacion(variacion)}</strong>
-          <span class="promedio__comparacion">${obtenerPeriodo(periodo).comparacion}</span>
-        </div>
-      </div>
-    </section>`
-}
-
-function tarjetaArea (area) {
-  return html`
-    <article class="tarjeta tarjeta-area">
-      <h3 class="tarjeta-area__nombre">${area.nombre}</h3>
-      <strong class="tarjeta-area__valor">${area.valor}%</strong>
-      ${barraProgreso({ valor: area.valor, etiqueta: area.nombre })}
-    </article>`
 }
 
 export function pantallaReporte ({ contenedor, params, query, ruta }, app) {
@@ -75,10 +46,9 @@ export function pantallaReporte ({ contenedor, params, query, ruta }, app) {
         estudiante: reporte.estudiante,
         complemento: selectorPildora({ id: 'periodo-reporte', etiqueta: 'Periodo del reporte', opciones: PERIODOS, valor: reporte.periodo })
       })}
-      ${tarjetaPromedio(reporte)}
+      ${tarjetaPromedio({ ...reporte, comparacion: obtenerPeriodo(reporte.periodo).comparacion })}
 
-      <h2 class="titulo-seccion">${icono('barras', { clase: 'titulo-seccion__icono' })}Desempeño por áreas</h2>
-      <div class="cuadricula-areas">${reporte.areas.map(tarjetaArea)}</div>
+      ${cuadriculaAreas(reporte.areas)}
 
       <nav class="reporte__enlaces" aria-label="Más información del estudiante">
         ${enlaceSeccion({ titulo: 'Falencias del estudiante', descripcion: 'Áreas que necesita reforzar', iconoNombre: 'alertaAmarilla', ruta: RUTAS_DOCENTE.falencias(estudianteId) })}

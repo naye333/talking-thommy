@@ -5,6 +5,9 @@ import { crearSesion, crearAlmacenSeguro } from './nucleo/sesion.js'
 import { crearClienteApi } from './nucleo/clienteApi.js'
 import { crearServicioAutenticacion } from './servicios/servicioAutenticacion.js'
 import { crearServicioDocente } from './servicios/docente/servicioDocente.js'
+import { crearServicioSyllabus } from './servicios/servicioSyllabus.js'
+import { crearServicioConversacion } from './servicios/estudiante/servicioConversacion.js'
+import { crearServicioProgreso } from './servicios/estudiante/servicioProgreso.js'
 import { crearRutasComunes, obtenerRutaInicio } from './perfiles/comun/rutas.js'
 import { crearRutasDocente } from './perfiles/docente/rutas.js'
 import { crearRutasEstudiante } from './perfiles/estudiante/rutas.js'
@@ -30,7 +33,15 @@ const app = {
   sesion,
   servicios: {
     autenticacion: crearServicioAutenticacion(cliente),
-    docente: crearServicioDocente({ usarDatosEjemplo: configuracion.usarDatosEjemplo })
+    docente: crearServicioDocente({ usarDatosEjemplo: configuracion.usarDatosEjemplo }),
+    syllabus: crearServicioSyllabus(cliente),
+    progreso: crearServicioProgreso({ usarDatosEjemplo: configuracion.usarDatosEjemplo }),
+    conversacion: crearServicioConversacion({
+      modo: configuracion.modoConversacion,
+      cliente,
+      urlApi: configuracion.urlApi,
+      obtenerToken: () => sesion.obtenerToken()
+    })
   },
   rutaInicio: () => obtenerRutaInicio(sesion.obtenerUsuario()),
   cerrarSesion () {
@@ -67,3 +78,13 @@ contenedor.addEventListener('click', (evento) => {
 })
 
 enrutador.iniciar()
+
+// Retira la pantalla de bienvenida tras una breve presentación
+const DURACION_BIENVENIDA_MS = 1100
+setTimeout(() => {
+  const bienvenida = document.getElementById('bienvenida')
+  if (!bienvenida) return
+  bienvenida.classList.add('bienvenida--saliendo')
+  bienvenida.addEventListener('transitionend', () => bienvenida.remove(), { once: true })
+  setTimeout(() => bienvenida.remove(), 600)
+}, DURACION_BIENVENIDA_MS)

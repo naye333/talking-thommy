@@ -1,22 +1,22 @@
-// Punto de entrada del perfil de estudiante. Sus pantallas se desarrollarán con sus propios diseños;
-// mientras tanto, un estudiante que inicia sesión ve este aviso en lugar de una página vacía.
-import { html, renderizar } from '../../nucleo/dom.js'
-import { plantillaPantalla } from '../../componentes/estructura.js'
-import { estadoVacio } from '../../componentes/estados.js'
-import { mascota, botonPrincipal } from '../../componentes/elementos.js'
+// Rutas del perfil estudiante. Todas exigen una sesión con rol "estudiante".
+import { crearPantallaCuenta } from '../comun/pantallas/cuenta.js'
+import { pantallaInicioEstudiante } from './pantallas/inicio.js'
+import { pantallaConversacion } from './pantallas/conversacion.js'
+import { pantallaLecciones } from './pantallas/lecciones.js'
+import { pantallaTema } from './pantallas/tema.js'
+import { pantallaProgreso } from './pantallas/progreso.js'
+import { navegacionEstudiante, RUTAS_ESTUDIANTE } from './navegacion.js'
 
-function pantallaEstudiantePendiente ({ contenedor }) {
-  renderizar(contenedor, plantillaPantalla({
-    clase: 'pantalla--sin-navegacion pantalla-ingreso',
-    contenido: html`
-      ${mascota({ variante: 'animo', clase: 'pantalla-ingreso__mascota' })}
-      ${estadoVacio({ titulo: 'El perfil de estudiante está en construcción', texto: 'Muy pronto podrás practicar con Thommy desde aquí.' })}
-      ${botonPrincipal({ texto: 'Cerrar sesión', accion: 'cerrar-sesion' })}`
-  }))
-}
+const pantallaPerfil = crearPantallaCuenta({ navegacion: () => navegacionEstudiante('perfil'), rutaAtras: RUTAS_ESTUDIANTE.inicio })
 
-export function crearRutasEstudiante () {
+export function crearRutasEstudiante (app) {
+  const ruta = (patron, pantalla) => ({ patron, perfil: 'estudiante', pantalla: (contexto) => pantalla(contexto, app) })
   return [
-    { patron: '/estudiante', perfil: 'estudiante', pantalla: pantallaEstudiantePendiente }
+    ruta('/estudiante', pantallaInicioEstudiante),
+    ruta('/estudiante/conversacion', pantallaConversacion),
+    ruta('/estudiante/lecciones', pantallaLecciones),
+    ruta('/estudiante/lecciones/temas/:id', pantallaTema),
+    ruta('/estudiante/progreso', pantallaProgreso),
+    ruta('/estudiante/perfil', pantallaPerfil)
   ]
 }

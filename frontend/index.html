@@ -14,9 +14,18 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/componentes.css">
   <link rel="stylesheet" href="css/docente.css">
+  <link rel="stylesheet" href="css/estudiante.css">
 </head>
 <body>
   <div id="app" class="app"></div>
+
+  <!-- Pantalla de bienvenida mientras arranca la app; app.js la retira -->
+  <div class="bienvenida" id="bienvenida" aria-hidden="true">
+    <img class="bienvenida__mascota" src="assets/img/thommy-bienvenida.png" alt="" width="250" height="225">
+    <p class="marca"><span class="marca__linea">Talking</span><span class="marca__linea marca__linea--lima">Thommy</span></p>
+    <p class="bienvenida__lema">Tu compañero para practicar inglés</p>
+    <div class="bienvenida__barra"><span></span></div>
+  </div>
 
   <noscript>Talking Thommy necesita JavaScript para funcionar.</noscript>
   <script type="module" src="js/app.js"></script>

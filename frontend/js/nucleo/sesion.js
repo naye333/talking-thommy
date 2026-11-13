@@ -83,7 +83,10 @@ export function crearSesion ({ almacen, ahora = () => Date.now() }) {
         return null
       }
       const datos = decodificarToken(guardada.token)
-      const usuario = guardada.usuario || { id: Number(datos.sub), rol: datos.rol, nivel: datos.nivel }
+      // El rol del token (firmado por el backend) prevalece sobre el usuario guardado
+      const usuario = guardada.usuario
+        ? { ...guardada.usuario, rol: datos.rol ?? guardada.usuario.rol }
+        : { id: Number(datos.sub), rol: datos.rol, nivel: datos.nivel }
       return { token: guardada.token, usuario }
     },
 
