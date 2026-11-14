@@ -71,6 +71,22 @@ Para cancelar un turno el cliente no envía nada: el siguiente `inicio_turno` de
 
 Mientras el backend responda `turno_recibido`, el frontend en modo `tiempoReal` muestra "Thommy todavía no puede responder" (`TUTOR_NO_DISPONIBLE`).
 
+### Audio del tutor (`respuesta.audioUrl`) · ⚠️ pendiente de acordar
+
+**Lo que ya hace el frontend** (`js/servicios/estudiante/voz.js`): al tocar 🔊 en un mensaje de Thommy, reproduce `audioUrl` si existe; si falta, no carga o el dispositivo bloquea la reproducción, lee el texto con la voz del dispositivo. Acepta URLs absolutas o relativas a `urlApi` y solo `http`/`https`.
+
+**Falta acordar con backend (Gabriela) e IA (Alisson)** y dejarlo escrito aquí:
+
+| Tema | Pregunta | Por qué importa en el frontend |
+|---|---|---|
+| Formato | ¿MP3, WAV, OGG/Opus? ¿Tamaño o duración máxima? | Debe reproducirse en Chrome y en el WebView de Android (iOS no reproduce OGG). |
+| Protocolo | ¿Siempre `https`? | La app Android se sirve como `https://localhost`: un audio `http` se bloquea por contenido mixto. |
+| Tipo de URL | ¿Absoluta (almacenamiento externo) o relativa a la API? ¿Pública o firmada y temporal? ¿Cuánto tiempo es válida? | El elemento `<audio>` **no puede enviar** `Authorization: Bearer`; si el audio exige el token, no se podrá reproducir. Una URL vencida cae a la voz del dispositivo. |
+| Contenido | ¿El audio lee `texto` + `frase` juntos, como hoy la voz del dispositivo? | Para que ambas opciones digan lo mismo. |
+| Saludo | ¿`saludo` de `POST /api/sesiones` también tendrá `audioUrl`? | El frontend ya lo soportaría sin cambios. |
+
+**Pendiente de validación:** la reproducción con un audio real del servidor no se ha probado; solo hay pruebas con un audio simulado y una prueba en Chrome de la caída a la voz del dispositivo (audio inexistente, 404). Se validará cuando backend e IA tengan la integración disponible, en navegador y en un celular Android.
+
 Errores que el frontend ya traduce: `TOKEN_INVALIDO`, `SESION_REQUERIDA`, `AUDIO_VACIO`, `AUDIO_DEMASIADO_GRANDE`, `TURNO_NO_INICIADO`, `ERROR_PROCESAMIENTO`.
 
 ## Progreso del estudiante (nuevo)

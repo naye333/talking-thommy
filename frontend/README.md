@@ -44,6 +44,7 @@ En Android Studio, pulsa **Run** con un emulador o con un celular conectado por 
 | Enviar reporte a padres | Deshabilitado: no existe el servicio |
 | Registro de estudiantes, lecciones (syllabus) | API real: `POST /api/auth/registro`, `GET /api/syllabus`, `GET /api/syllabus/temas/:id` |
 | Conversación con Thommy | Micrófono real; tutor **simulado** (`modoConversacion: 'ejemplo'`). Con `'tiempoReal'` usa REST + WebSocket según [`docs/contrato-api-perfil-estudiante.md`](../docs/contrato-api-perfil-estudiante.md) |
+| Audio del tutor (`respuesta.audioUrl`) | Se reproduce si llega; si no, voz del dispositivo. **Pendiente:** acordar formato, protocolo y tipo de URL, y validar con un audio real. Ver la sección "Audio del tutor" en [`docs/contrato-api-perfil-estudiante.md`](../docs/contrato-api-perfil-estudiante.md) |
 | Progreso del estudiante | **Datos de ejemplo** (`usarDatosEjemploProgreso: true`) hasta que exista `GET /api/estudiante/progreso` |
 
 El micrófono necesita HTTPS o `localhost` en el navegador; en Android, el permiso `RECORD_AUDIO` ya está en el manifiesto.
