@@ -48,6 +48,9 @@ export function crearClienteApi ({ urlBase, obtenerToken = () => null, alSesionI
 
   return {
     get: (ruta) => solicitar('GET', ruta),
-    post: (ruta, cuerpo) => solicitar('POST', ruta, { cuerpo })
+    post: (ruta, cuerpo) => solicitar('POST', ruta, { cuerpo }),
+    patch: (ruta, cuerpo) => solicitar('PATCH', ruta, { cuerpo }),
+    // Una respuesta 204 (sin cuerpo) se devuelve como null
+    delete: (ruta) => solicitar('DELETE', ruta)
   }
 }

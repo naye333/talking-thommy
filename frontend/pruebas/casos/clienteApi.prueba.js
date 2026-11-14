@@ -70,6 +70,37 @@ describir('clienteApi', (prueba) => {
     afirmar.igual(obtenerMensajeError(error), 'No pudimos conectar con el servidor. Revisa tu conexión.')
   })
 
+  prueba('patch envía el método y el cuerpo JSON', async () => {
+    let solicitud
+    const cliente = crearClienteApi({
+      urlBase: '',
+      fetchImpl: async (url, opciones) => {
+        solicitud = { url, opciones }
+        return respuestaFalsa(200, { recomendacion: { id: 7, incluida: false } })
+      }
+    })
+    const datos = await cliente.patch('/api/recurso/7', { incluida: false })
+    afirmar.profundo(datos, { recomendacion: { id: 7, incluida: false } })
+    afirmar.igual(solicitud.opciones.method, 'PATCH')
+    afirmar.igual(solicitud.opciones.headers['Content-Type'], 'application/json')
+    afirmar.igual(solicitud.opciones.body, '{"incluida":false}')
+  })
+
+  prueba('delete sin cuerpo y con respuesta 204 devuelve null', async () => {
+    let solicitud
+    const cliente = crearClienteApi({
+      urlBase: '',
+      fetchImpl: async (url, opciones) => {
+        solicitud = { url, opciones }
+        return respuestaFalsa(204)
+      }
+    })
+    afirmar.igual(await cliente.delete('/api/recurso/7'), null)
+    afirmar.igual(solicitud.opciones.method, 'DELETE')
+    afirmar.igual(solicitud.opciones.body, undefined)
+    afirmar.igual(solicitud.opciones.headers['Content-Type'], undefined)
+  })
+
   prueba('una respuesta sin JSON se reporta como ERROR_INTERNO', async () => {
     const cliente = crearClienteApi({ urlBase: '', fetchImpl: async () => respuestaFalsa(502) })
     await afirmar.rechaza(cliente.get('/x'), 'ERROR_INTERNO')
