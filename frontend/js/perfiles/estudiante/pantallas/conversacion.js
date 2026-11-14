@@ -241,6 +241,6 @@ export async function pantallaConversacion ({ contenedor, query }, app) {
     acciones[boton.dataset.accion]?.()
   }
 
-  iniciar()
+  void iniciar()
   return limpiar
 }

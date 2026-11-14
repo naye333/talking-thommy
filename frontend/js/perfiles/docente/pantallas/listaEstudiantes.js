@@ -78,7 +78,7 @@ export function crearPantallaListaEstudiantes (modo) {
       })
     }
 
-    cargar()
+    void cargar()
 
     if (!configuracion.conBuscador) return
     let temporizador = null

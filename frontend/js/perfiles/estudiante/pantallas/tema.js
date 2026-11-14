@@ -24,7 +24,7 @@ export function pantallaTema ({ contenedor, params }, app) {
   }))
 
   const region = contenedor.querySelector('[data-region="tema"]')
-  cargarRegion(region, {
+  void cargarRegion(region, {
     cargar: () => app.servicios.syllabus.consultarTema(params.id),
     textoCargando: 'Cargando tema…',
     mostrar: (tema) => html`

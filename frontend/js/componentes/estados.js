@@ -43,7 +43,7 @@ export async function cargarRegion (region, { cargar, mostrar, alMostrar, textoC
     const conReintento = ![404, 501].includes(error.estado)
     renderizar(region, estadoError(obtenerMensajeError(error), { conReintento }))
     region.querySelector('[data-accion="reintentar"]')?.addEventListener('click', () => {
-      cargarRegion(region, { cargar, mostrar, alMostrar, textoCargando })
+      void cargarRegion(region, { cargar, mostrar, alMostrar, textoCargando })
     }, { once: true })
   }
 }

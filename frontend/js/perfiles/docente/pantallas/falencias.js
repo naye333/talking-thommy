@@ -34,7 +34,7 @@ export function pantallaFalencias ({ contenedor, params }, app) {
     navegacion: navegacionDocente()
   }))
 
-  cargarRegion(contenedor.querySelector('[data-region="falencias"]'), {
+  void cargarRegion(contenedor.querySelector('[data-region="falencias"]'), {
     cargar: () => servicio.obtenerFalencias(estudianteId),
     textoCargando: 'Cargando falencias…',
     mostrar: ({ estudiante, falencias }) => html`

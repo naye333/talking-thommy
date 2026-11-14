@@ -44,11 +44,11 @@ export function pantallaProgreso ({ contenedor, query, ruta }, app) {
         region.querySelector('#periodo-progreso').addEventListener('change', (evento) => {
           periodo = obtenerPeriodo(evento.target.value)
           reemplazarQuery(ruta, { periodo: periodo.valor })
-          cargar()
+          void cargar()
         })
       }
     })
   }
 
-  cargar()
+  void cargar()
 }

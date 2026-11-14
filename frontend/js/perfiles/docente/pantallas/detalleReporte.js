@@ -22,7 +22,7 @@ export function pantallaDetalleReporte ({ contenedor, params, query }, app) {
     navegacion: navegacionDocente()
   }))
 
-  cargarRegion(contenedor.querySelector('[data-region="detalle"]'), {
+  void cargarRegion(contenedor.querySelector('[data-region="detalle"]'), {
     cargar: () => servicio.obtenerDetalle(estudianteId, { periodo: periodo.valor }),
     textoCargando: 'Cargando detalle…',
     mostrar: ({ estudiante, evolucion, fortalezas, areasMejorar }) => html`

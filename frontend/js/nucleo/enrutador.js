@@ -92,7 +92,12 @@ export function crearEnrutador ({ rutas, contenedor, antesDeEntrar = () => null,
     procesarCambio()
   }
 
-  async function procesarCambio () {
+  // Si una pantalla falla al montarse, el error queda registrado en vez de ser una promesa rechazada sin manejar
+  function procesarCambio () {
+    mostrarPantalla().catch((error) => console.error('[enrutador] no se pudo mostrar la pantalla:', error))
+  }
+
+  async function mostrarPantalla () {
     const { ruta, query } = analizarHash(ventana.location.hash)
     const resultado = resolverRuta(rutasPreparadas, ruta)
 

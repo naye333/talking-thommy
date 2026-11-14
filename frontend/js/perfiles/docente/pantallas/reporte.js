@@ -67,11 +67,11 @@ export function pantallaReporte ({ contenedor, params, query, ruta }, app) {
         region.querySelector('#periodo-reporte').addEventListener('change', (evento) => {
           periodo = evento.target.value
           reemplazarQuery(ruta, { periodo })
-          cargar()
+          void cargar()
         })
       }
     })
   }
 
-  cargar()
+  void cargar()
 }

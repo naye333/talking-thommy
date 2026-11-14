@@ -68,8 +68,8 @@ export function pantallaLecciones ({ contenedor, query, ruta }, app) {
     if (!pestana || Number(pestana.dataset.nivel) === nivel) return
     nivel = Number(pestana.dataset.nivel)
     reemplazarQuery(ruta, { nivel })
-    cargar()
+    void cargar()
   })
 
-  cargar()
+  void cargar()
 }

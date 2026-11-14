@@ -111,9 +111,9 @@ export function pantallaAcciones ({ contenedor, params }, app) {
       const recomendacion = recomendaciones.find((candidata) => candidata.id === boton.dataset.id)
       if (!recomendacion) return
       if (boton.dataset.accion === 'alternar') {
-        ejecutar(() => servicio.actualizarRecomendacion(estudianteId, recomendacion.id, { incluida: !recomendacion.incluida }), boton)
+        void ejecutar(() => servicio.actualizarRecomendacion(estudianteId, recomendacion.id, { incluida: !recomendacion.incluida }), boton)
       } else if (boton.dataset.accion === 'eliminar') {
-        ejecutar(() => servicio.eliminarRecomendacion(estudianteId, recomendacion.id), boton)
+        void ejecutar(() => servicio.eliminarRecomendacion(estudianteId, recomendacion.id), boton)
       }
     })
 
@@ -150,7 +150,7 @@ export function pantallaAcciones ({ contenedor, params }, app) {
     })
   }
 
-  cargarRegion(region, {
+  void cargarRegion(region, {
     cargar: async () => {
       const datos = await servicio.listarRecomendaciones(estudianteId)
       recomendaciones = datos.recomendaciones
