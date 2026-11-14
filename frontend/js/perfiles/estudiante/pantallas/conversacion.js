@@ -186,8 +186,15 @@ export async function pantallaConversacion ({ contenedor, query }, app) {
       return
     }
     if (!estaActiva) return liberarGrabacion()
-    sesion.iniciarTurno()
-    grabadora.iniciar()
+    // Si la conexión con el servidor se cayó, iniciarTurno lanza SIN_CONEXION: se apaga el micrófono y se avisa
+    try {
+      sesion.iniciarTurno()
+      grabadora.iniciar()
+    } catch (error) {
+      liberarGrabacion()
+      aviso(obtenerMensajeError(error))
+      return
+    }
     mostrarCapa('escuchando')
     animarOnda()
     limiteTurno = setTimeout(terminarTurno, DURACION_MAXIMA_MS)
