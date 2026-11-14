@@ -40,11 +40,11 @@ En Android Studio, pulsa **Run** con un emulador o con un celular conectado por 
 | Función | Fuente |
 |---|---|
 | Iniciar sesión, consultar la cuenta | API real: `POST /api/auth/ingreso`, `GET /api/auth/yo` |
-| Estudiantes del docente, reportes, falencias, evolución, recomendaciones | **Datos de ejemplo** (`usarDatosEjemplo: true`) hasta que existan los endpoints. Propuesta en [`docs/propuesta-api-perfil-docente.md`](../docs/propuesta-api-perfil-docente.md) |
+| Estudiantes del docente, reportes, falencias, evolución, recomendaciones | **Datos de ejemplo** (`usarDatosEjemploDocente: true`) hasta que existan los endpoints. Propuesta en [`docs/propuesta-api-perfil-docente.md`](../docs/propuesta-api-perfil-docente.md) |
 | Enviar reporte a padres | Deshabilitado: no existe el servicio |
 | Registro de estudiantes, lecciones (syllabus) | API real: `POST /api/auth/registro`, `GET /api/syllabus`, `GET /api/syllabus/temas/:id` |
 | Conversación con Thommy | Micrófono real; tutor **simulado** (`modoConversacion: 'ejemplo'`). Con `'tiempoReal'` usa REST + WebSocket según [`docs/contrato-api-perfil-estudiante.md`](../docs/contrato-api-perfil-estudiante.md) |
-| Progreso del estudiante | **Datos de ejemplo** hasta que exista `GET /api/estudiante/progreso` |
+| Progreso del estudiante | **Datos de ejemplo** (`usarDatosEjemploProgreso: true`) hasta que exista `GET /api/estudiante/progreso` |
 
 El micrófono necesita HTTPS o `localhost` en el navegador; en Android, el permiso `RECORD_AUDIO` ya está en el manifiesto.
 

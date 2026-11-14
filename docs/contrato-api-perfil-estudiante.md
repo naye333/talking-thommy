@@ -2,7 +2,8 @@
 
 > **Para el equipo de backend e IA.** El frontend ya está construido sobre este contrato y hoy usa respuestas simuladas. Al implementarlo, basta con cambiar en `frontend/js/config.js`:
 > - `modoConversacion: 'tiempoReal'` → conversación real.
-> - `usarDatosEjemplo: false` → progreso real (y perfil docente, ver `propuesta-api-perfil-docente.md`).
+> - `usarDatosEjemploProgreso: false` → progreso real.
+> - `usarDatosEjemploDocente: false` → perfil docente real (ver `propuesta-api-perfil-docente.md`).
 
 ## Ya existente (el frontend lo usa tal cual)
 

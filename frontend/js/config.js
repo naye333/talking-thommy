@@ -2,10 +2,12 @@
 export const configuracion = Object.freeze({
   urlApi: 'http://localhost:3000',
 
-  // El backend todavía no tiene endpoints para el perfil docente (estudiantes, reportes,
-  // falencias, recomendaciones). Mientras sea true, esas pantallas usan datos de ejemplo.
-  // Ver docs/propuesta-api-perfil-docente.md
-  usarDatosEjemplo: true,
+  // El backend todavía no tiene estos endpoints. Mientras sean true, esas pantallas usan datos de ejemplo.
+  // Son independientes porque los endpoints pueden llegar en momentos distintos.
+  // Perfil docente (estudiantes, reportes, falencias, recomendaciones): docs/propuesta-api-perfil-docente.md
+  usarDatosEjemploDocente: true,
+  // Progreso del estudiante (GET /api/estudiante/progreso): docs/contrato-api-perfil-estudiante.md
+  usarDatosEjemploProgreso: true,
 
   // Conversación con Thommy:
   //   'ejemplo'    → tutor simulado en el frontend (el backend aún no transcribe ni evalúa)
