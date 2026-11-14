@@ -50,8 +50,8 @@ export function escucharThommy ({ texto, audioUrl, urlBase }, { AudioImpl = glob
   }
   audio.addEventListener('error', usarRespaldo, { once: true })
   audio.addEventListener('ended', () => { if (audioActual === audio) audioActual = null }, { once: true })
-  const reproduccion = audio.play()
-  if (reproduccion && typeof reproduccion.catch === 'function') reproduccion.catch(usarRespaldo)
+  // play() devuelve una promesa que se rechaza si el dispositivo bloquea la reproducción
+  audio.play()?.catch(usarRespaldo)
   return true
 }
 

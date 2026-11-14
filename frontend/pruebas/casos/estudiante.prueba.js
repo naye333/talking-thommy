@@ -174,6 +174,16 @@ describir('estudiante', (prueba) => {
     afirmar.igual(creados.length, 1)
   })
 
+  prueba('si play() no devuelve una promesa (navegadores antiguos), el audio se reproduce sin errores', async () => {
+    const { AudioFalso, creados } = crearAudioFalso({ playSinPromesa: true })
+    const leidos = []
+    afirmar.igual(escucharThommy({ texto: 'Well done!', audioUrl: 'https://cdn.ejemplo.co/1.mp3' }, { AudioImpl: AudioFalso, leer: (texto) => leidos.push(texto) }), true)
+    await new Promise((resolve) => setTimeout(resolve))
+    afirmar.verdadero(creados[0].reproducido)
+    afirmar.profundo(leidos, [])
+    callar()
+  })
+
   prueba('callar detiene el audio del tutor sin activar la voz de respaldo', async () => {
     const { AudioFalso, creados } = crearAudioFalso({ rechazarPlay: true })
     const leidos = []
@@ -193,7 +203,7 @@ describir('estudiante', (prueba) => {
 })
 
 // Audio falso: registra lo que se reproduce; play() puede rechazarse como cuando el dispositivo lo bloquea
-function crearAudioFalso ({ rechazarPlay = false } = {}) {
+function crearAudioFalso ({ rechazarPlay = false, playSinPromesa = false } = {}) {
   const creados = []
   class AudioFalso extends EventTarget {
     constructor (url) {
@@ -204,6 +214,7 @@ function crearAudioFalso ({ rechazarPlay = false } = {}) {
 
     play () {
       this.reproducido = true
+      if (playSinPromesa) return
       return rechazarPlay ? Promise.reject(new Error('NotAllowedError')) : Promise.resolve()
     }
 
