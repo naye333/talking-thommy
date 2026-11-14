@@ -12,5 +12,9 @@ export const configuracion = Object.freeze({
   // Conversación con Thommy:
   //   'ejemplo'    → tutor simulado en el frontend (el backend aún no transcribe ni evalúa)
   //   'tiempoReal' → POST /api/sesiones + WebSocket /tiempo-real (ver docs/contrato-api-perfil-estudiante.md)
-  modoConversacion: 'ejemplo'
+  modoConversacion: 'ejemplo',
+
+  // Modo 'tiempoReal': cuánto esperar la respuesta del servidor (conexión y resultado de cada turno)
+  // antes de mostrar SIN_CONEXION. Ajustar según la latencia que mida el equipo de IA.
+  tiempoMaximoRespuestaMs: 30000
 })

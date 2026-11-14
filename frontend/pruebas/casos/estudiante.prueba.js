@@ -104,6 +104,18 @@ describir('estudiante', (prueba) => {
     await afirmar.rechaza(sesion.finalizarTurno(), 'TUTOR_NO_DISPONIBLE')
   })
 
+  prueba('en tiempo real, el servicio usa el tiempo máximo de respuesta configurado', async () => {
+    // El servidor falso no responde al fin del turno: la espera vence según tiempoMaximoMs
+    const { WebSocketFalso } = crearWebSocketFalso([])
+    const cliente = { post: async () => ({ sesion: { id: 's1' }, saludo: { texto: 'Hi' } }) }
+    const servicio = crearServicioConversacion({ modo: 'tiempoReal', cliente, urlApi: '', obtenerToken: () => 't', WebSocketImpl: WebSocketFalso, tiempoMaximoMs: 20 })
+    const sesion = await servicio.iniciar({ tema: TEMA })
+    sesion.iniciarTurno()
+    const inicio = Date.now()
+    await afirmar.rechaza(sesion.finalizarTurno(), 'SIN_CONEXION')
+    afirmar.verdadero(Date.now() - inicio < 1000)
+  })
+
   prueba('el progreso de ejemplo trae reporte y evolución', async () => {
     const progreso = await crearServicioProgreso({ usarDatosEjemplo: true, demoraMs: 0 }).obtenerProgreso({ periodo: 'ultimo_mes' })
     afirmar.igual(progreso.areas.length, 4)

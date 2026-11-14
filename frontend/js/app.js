@@ -40,7 +40,8 @@ const app = {
       modo: configuracion.modoConversacion,
       cliente,
       urlApi: configuracion.urlApi,
-      obtenerToken: () => sesion.obtenerToken()
+      obtenerToken: () => sesion.obtenerToken(),
+      tiempoMaximoMs: configuracion.tiempoMaximoRespuestaMs
     })
   },
   rutaInicio: () => obtenerRutaInicio(sesion.obtenerUsuario()),

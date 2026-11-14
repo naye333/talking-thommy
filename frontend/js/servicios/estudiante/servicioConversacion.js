@@ -41,12 +41,13 @@ function crearSesionEjemplo ({ tema, demoraMs }) {
   }
 }
 
-async function crearSesionTiempoReal ({ tema, cliente, urlApi, obtenerToken, WebSocketImpl }) {
+async function crearSesionTiempoReal ({ tema, cliente, urlApi, obtenerToken, WebSocketImpl, tiempoMaximoMs }) {
   // POST /api/sesiones (propuesto) → { sesion: { id }, saludo: { texto, frase } }
   const { sesion, saludo } = await cliente.post('/api/sesiones', { temaId: tema?.id ?? null })
   const tiempoReal = crearClienteTiempoReal({
     url: construirUrlTiempoReal(urlApi, { sesionId: sesion.id, token: obtenerToken() }),
-    WebSocketImpl
+    WebSocketImpl,
+    tiempoMaximoMs
   })
   await tiempoReal.conectar()
   let envios = Promise.resolve()
@@ -76,12 +77,13 @@ async function crearSesionTiempoReal ({ tema, cliente, urlApi, obtenerToken, Web
   }
 }
 
-export function crearServicioConversacion ({ modo, cliente, urlApi, obtenerToken, demoraMs = 900, WebSocketImpl }) {
+// tiempoMaximoMs: espera máxima de las respuestas del WebSocket; si falta, se usa la del cliente de tiempo real
+export function crearServicioConversacion ({ modo, cliente, urlApi, obtenerToken, demoraMs = 900, WebSocketImpl, tiempoMaximoMs }) {
   return {
     capacidades: { datosEjemplo: modo === 'ejemplo' },
     iniciar ({ tema = null } = {}) {
       if (modo === 'ejemplo') return Promise.resolve(crearSesionEjemplo({ tema, demoraMs }))
-      return crearSesionTiempoReal({ tema, cliente, urlApi, obtenerToken, WebSocketImpl })
+      return crearSesionTiempoReal({ tema, cliente, urlApi, obtenerToken, WebSocketImpl, tiempoMaximoMs })
     }
   }
 }
