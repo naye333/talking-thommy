@@ -4,6 +4,7 @@ import { crearServicioConversacion } from '../../js/servicios/estudiante/servici
 import { crearClienteTiempoReal, construirUrlTiempoReal } from '../../js/servicios/estudiante/clienteTiempoReal.js'
 import { crearServicioProgreso } from '../../js/servicios/estudiante/servicioProgreso.js'
 import { validarFormularioRegistro } from '../../js/perfiles/comun/pantallas/registro.js'
+import { resolverUrlAudio, puedeEscuchar, escucharThommy, callar } from '../../js/servicios/estudiante/voz.js'
 
 const TEMA = { id: 3, titulo: 'Introducing yourself', frasesModelo: ['Hi, let me introduce myself.', 'Nice to meet you.'] }
 
@@ -129,4 +130,84 @@ describir('estudiante', (prueba) => {
     const errores = validarFormularioRegistro({ ...valido, nombre: '', confirmacion: 'otra', nivel: 0 })
     afirmar.profundo(Object.keys(errores), ['nombre', 'confirmacion', 'nivel'])
   })
+
+  prueba('resuelve la URL del audio del tutor y rechaza las no válidas', () => {
+    afirmar.igual(resolverUrlAudio('https://cdn.ejemplo.co/a.mp3'), 'https://cdn.ejemplo.co/a.mp3')
+    afirmar.igual(resolverUrlAudio('/audio/a.mp3', 'https://api.ejemplo.co'), 'https://api.ejemplo.co/audio/a.mp3')
+    afirmar.igual(resolverUrlAudio('/audio/a.mp3'), null)
+    afirmar.igual(resolverUrlAudio('javascript:alert(1)', 'https://api.ejemplo.co'), null)
+    afirmar.igual(resolverUrlAudio(null), null)
+    afirmar.igual(resolverUrlAudio(''), null)
+  })
+
+  prueba('sin audioUrl, Thommy se escucha con la voz del dispositivo', () => {
+    const { AudioFalso, creados } = crearAudioFalso()
+    const leidos = []
+    escucharThommy({ texto: 'Hi! Try this.', audioUrl: null }, { AudioImpl: AudioFalso, leer: (texto) => leidos.push(texto) })
+    afirmar.profundo(leidos, ['Hi! Try this.'])
+    afirmar.igual(creados.length, 0)
+  })
+
+  prueba('con audioUrl, se reproduce el audio del servidor y no la voz del dispositivo', async () => {
+    const { AudioFalso, creados } = crearAudioFalso()
+    const leidos = []
+    escucharThommy({ texto: 'Well done!', audioUrl: '/audio/1.mp3', urlBase: 'https://api.ejemplo.co' }, { AudioImpl: AudioFalso, leer: (texto) => leidos.push(texto) })
+    await Promise.resolve()
+    afirmar.igual(creados.length, 1)
+    afirmar.igual(creados[0].url, 'https://api.ejemplo.co/audio/1.mp3')
+    afirmar.verdadero(creados[0].reproducido)
+    afirmar.profundo(leidos, [])
+    callar()
+  })
+
+  prueba('si el audio no se puede reproducir o falla al cargar, usa la voz del dispositivo', async () => {
+    const { AudioFalso, creados } = crearAudioFalso({ rechazarPlay: true })
+    const leidos = []
+    escucharThommy({ texto: 'Well done!', audioUrl: 'https://cdn.ejemplo.co/1.mp3' }, { AudioImpl: AudioFalso, leer: (texto) => leidos.push(texto) })
+    await new Promise((resolve) => setTimeout(resolve))
+    afirmar.profundo(leidos, ['Well done!'])
+
+    const conError = crearAudioFalso()
+    escucharThommy({ texto: 'Nice work!', audioUrl: 'https://cdn.ejemplo.co/2.mp3' }, { AudioImpl: conError.AudioFalso, leer: (texto) => leidos.push(texto) })
+    conError.creados[0].dispatchEvent(new Event('error'))
+    afirmar.profundo(leidos, ['Well done!', 'Nice work!'])
+    afirmar.igual(creados.length, 1)
+  })
+
+  prueba('callar detiene el audio del tutor sin activar la voz de respaldo', async () => {
+    const { AudioFalso, creados } = crearAudioFalso({ rechazarPlay: true })
+    const leidos = []
+    escucharThommy({ texto: 'Well done!', audioUrl: 'https://cdn.ejemplo.co/1.mp3' }, { AudioImpl: AudioFalso, leer: (texto) => leidos.push(texto) })
+    callar()
+    await new Promise((resolve) => setTimeout(resolve))
+    afirmar.verdadero(creados[0].pausado)
+    afirmar.profundo(leidos, [])
+  })
+
+  prueba('el botón de escuchar aparece si hay audio del tutor aunque el dispositivo no tenga voz', () => {
+    const { AudioFalso } = crearAudioFalso()
+    // En Node no existe speechSynthesis: solo el audio del servidor permite escuchar
+    afirmar.verdadero(puedeEscuchar({ texto: 'Hi', audioUrl: 'https://cdn.ejemplo.co/1.mp3' }, { AudioImpl: AudioFalso }))
+    afirmar.igual(puedeEscuchar({ texto: 'Hi', audioUrl: null }, { AudioImpl: AudioFalso }), false)
+  })
 })
+
+// Audio falso: registra lo que se reproduce; play() puede rechazarse como cuando el dispositivo lo bloquea
+function crearAudioFalso ({ rechazarPlay = false } = {}) {
+  const creados = []
+  class AudioFalso extends EventTarget {
+    constructor (url) {
+      super()
+      this.url = url
+      creados.push(this)
+    }
+
+    play () {
+      this.reproducido = true
+      return rechazarPlay ? Promise.reject(new Error('NotAllowedError')) : Promise.resolve()
+    }
+
+    pause () { this.pausado = true }
+  }
+  return { AudioFalso, creados }
+}

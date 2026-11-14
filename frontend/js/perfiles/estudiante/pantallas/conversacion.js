@@ -8,7 +8,7 @@ import { mascota, botonPrincipal, avisoDatosEjemplo } from '../../../componentes
 import { estadoCargando, estadoError } from '../../../componentes/estados.js'
 import { icono } from '../../../componentes/iconos.js'
 import { crearGrabadora } from '../../../servicios/estudiante/grabadora.js'
-import { hablar, callar, vozDisponible } from '../../../servicios/estudiante/voz.js'
+import { escucharThommy, callar, puedeEscuchar } from '../../../servicios/estudiante/voz.js'
 import { RUTAS_ESTUDIANTE } from '../navegacion.js'
 
 const BARRAS_ONDA = 28
@@ -18,14 +18,15 @@ function ondaDecorativa (clase) {
   return html`<span class="onda ${clase}" aria-hidden="true">${Array.from({ length: 7 }, (_, indice) => html`<i style="--i: ${indice}"></i>`)}</span>`
 }
 
-function mensajeThommy ({ texto, frase }) {
+// audioUrl (opcional, solo en respuesta): audio del tutor; si falta, el botón usa la voz del dispositivo
+function mensajeThommy ({ texto, frase, audioUrl }, urlBase) {
   const lectura = frase ? `${texto} ${frase}` : texto
   return html`
     <li class="mensaje mensaje--thommy">
       <p class="mensaje__texto" lang="en">${texto}</p>
       ${frase ? html`<p class="mensaje__frase" lang="en">“${frase}”</p>` : ''}
-      ${vozDisponible()
-        ? html`<button class="mensaje__escuchar" type="button" data-accion="escuchar" data-texto="${lectura}" aria-label="Escuchar a Thommy">${icono('volumen')}</button>`
+      ${puedeEscuchar({ texto: lectura, audioUrl, urlBase })
+        ? html`<button class="mensaje__escuchar" type="button" data-accion="escuchar" data-texto="${lectura}" data-audio-url="${audioUrl || ''}" aria-label="Escuchar a Thommy">${icono('volumen')}</button>`
         : ''}
     </li>`
 }
@@ -120,7 +121,7 @@ export async function pantallaConversacion ({ contenedor, query }, app) {
         ${icono('libroAbierto')}<span>${tema ? tema.titulo : 'Conversación libre · elige un tema'}</span>
       </a>
       <div class="conversacion__escena">${mascota({ variante: 'conversacion', clase: 'conversacion__mascota' })}</div>
-      <ol class="conversacion__mensajes" data-region="mensajes" aria-live="polite">${mensajeThommy(sesion.saludo)}</ol>
+      <ol class="conversacion__mensajes" data-region="mensajes" aria-live="polite">${mensajeThommy(sesion.saludo, app.configuracion.urlApi)}</ol>
       <p class="mensaje-error" role="alert" data-region="aviso"></p>
       ${avisoDatosEjemplo({ visible: servicio.capacidades.datosEjemplo })}
 
@@ -228,7 +229,7 @@ export async function pantallaConversacion ({ contenedor, query }, app) {
 
   function continuar () {
     const lista = region.querySelector('[data-region="mensajes"]')
-    lista.insertAdjacentHTML('beforeend', mensajeEstudiante(resultadoPendiente).texto + mensajeThommy(resultadoPendiente.respuesta).texto)
+    lista.insertAdjacentHTML('beforeend', mensajeEstudiante(resultadoPendiente).texto + mensajeThommy(resultadoPendiente.respuesta, app.configuracion.urlApi).texto)
     resultadoPendiente = null
     mostrarCapa(null)
     lista.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -243,7 +244,7 @@ export async function pantallaConversacion ({ contenedor, query }, app) {
       'terminar-turno': terminarTurno,
       'cancelar-turno': cancelarTurno,
       continuar,
-      escuchar: () => hablar(boton.dataset.texto)
+      escuchar: () => escucharThommy({ texto: boton.dataset.texto, audioUrl: boton.dataset.audioUrl, urlBase: app.configuracion.urlApi })
     }
     acciones[boton.dataset.accion]?.()
   }
