@@ -33,15 +33,24 @@ allprojects {
         lockAllConfigurations()
     }
 
-    // Patrón de la documentación de Gradle ("Locking dependency versions"): resuelve todas las
-    // configuraciones del módulo para que --write-locks escriba su lockfile
+    // Resuelve las configuraciones de compilación y ejecución del módulo para que --write-locks
+    // escriba su lockfile. Las configuraciones internas del plugin de Android que no se pueden
+    // resolver de forma directa (ambiguas) se omiten.
     tasks.register('escribirLocks') {
         notCompatibleWithConfigurationCache('Filtra las configuraciones al ejecutarse')
         doFirst {
             assert gradle.startParameter.writeDependencyLocks : "$path se ejecuta con --write-locks"
         }
         doLast {
-            configurations.findAll { it.canBeResolved }.each { it.resolve() }
+            configurations
+                .findAll { it.canBeResolved && it.name ==~ /(?i).*(compileclasspath|runtimeclasspath)$/ }
+                .each { configuracion ->
+                    try {
+                        configuracion.resolve()
+                    } catch (Exception error) {
+                        logger.warn("escribirLocks: se omite ${configuracion.name} (${error.message?.readLines()?.first()})")
+                    }
+                }
         }
     }
 }
