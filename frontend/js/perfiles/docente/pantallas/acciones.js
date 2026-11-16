@@ -73,6 +73,13 @@ export function pantallaAcciones ({ contenedor, params }, app) {
         <p class="mensaje-error" role="alert" data-mensaje-sugerencias></p>
       </section>
 
+      <section class="tarjeta seccion-cuenta">
+        <h2 class="seccion-cuenta__titulo">${icono('candado', { clase: 'seccion-cuenta__icono' })}Cuenta del estudiante</h2>
+        <p class="grupo__ayuda">Si ${estudiante.nombre} olvidó su contraseña, genera una temporal y dísela. Después puede cambiarla en su perfil.</p>
+        <button class="boton-contorno" type="button" data-accion="contrasena-temporal">Generar contraseña temporal</button>
+        <p class="seccion-cuenta__exito" role="status" data-contrasena-temporal></p>
+      </section>
+
       ${botonPrincipal({ texto: 'Enviar reporte a padres', iconoInicio: 'avion', accion: 'enviar-padres', deshabilitado: !envioDisponible })}
       <p class="acciones__nota" role="status" data-mensaje-envio>
         ${envioDisponible ? '' : 'El envío a padres estará disponible cuando exista el servicio en el servidor.'}
@@ -132,6 +139,19 @@ export function pantallaAcciones ({ contenedor, params }, app) {
         formulario.querySelector('button').disabled = false
         entrada.focus()
       }
+    })
+
+    regionLista.querySelector('[data-accion="contrasena-temporal"]').addEventListener('click', async (evento) => {
+      const boton = evento.currentTarget
+      const resultado = regionLista.querySelector('[data-contrasena-temporal]')
+      boton.disabled = true
+      try {
+        const { contrasenaTemporal } = await servicio.restablecerContrasena(estudianteId)
+        resultado.textContent = `Contraseña temporal: ${contrasenaTemporal}`
+      } catch (error) {
+        resultado.textContent = obtenerMensajeError(error)
+      }
+      boton.disabled = false
     })
 
     regionLista.querySelector('[data-accion="enviar-padres"]').addEventListener('click', async (evento) => {

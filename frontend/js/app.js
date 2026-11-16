@@ -4,6 +4,7 @@ import { crearEnrutador } from './nucleo/enrutador.js'
 import { crearSesion, crearAlmacenSeguro } from './nucleo/sesion.js'
 import { crearClienteApi } from './nucleo/clienteApi.js'
 import { crearServicioAutenticacion } from './servicios/servicioAutenticacion.js'
+import { crearServicioCuenta } from './servicios/servicioCuenta.js'
 import { crearServicioDocente } from './servicios/docente/servicioDocente.js'
 import { crearServicioSyllabus } from './servicios/servicioSyllabus.js'
 import { crearServicioConversacion } from './servicios/estudiante/servicioConversacion.js'
@@ -33,6 +34,7 @@ const app = {
   sesion,
   servicios: {
     autenticacion: crearServicioAutenticacion(cliente),
+    cuenta: crearServicioCuenta(cliente),
     docente: crearServicioDocente({ usarDatosEjemplo: configuracion.usarDatosEjemploDocente, cliente }),
     syllabus: crearServicioSyllabus(cliente),
     progreso: crearServicioProgreso({ usarDatosEjemplo: configuracion.usarDatosEjemploProgreso, cliente }),

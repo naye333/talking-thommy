@@ -61,6 +61,11 @@ export function crearServicioDocenteApi (cliente) {
       return { eliminada: String(recomendacionId) }
     },
 
+    // → { estudiante, contrasenaTemporal } para el estudiante que olvidó su contraseña
+    restablecerContrasena (estudianteId) {
+      return cliente.post(`${rutaEstudiante(estudianteId)}/contrasena-temporal`)
+    },
+
     // Pendiente de decisión del equipo (ver docs/propuesta-api-perfil-docente.md)
     async enviarReportePadres () {
       throw new ErrorApi({ codigo: 'SERVICIO_NO_DISPONIBLE', estado: 501 })

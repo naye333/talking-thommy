@@ -209,6 +209,10 @@ export function crearServicioDocente ({ usarDatosEjemplo, demoraMs = 220, client
       })
     },
 
+    restablecerContrasena (estudianteId) {
+      return responder(() => ({ estudiante: resumenEstudiante(buscarEstudiante(estudianteId)), contrasenaTemporal: 'ejemplo2345' }))
+    },
+
     // No existe un servicio de envío a padres en el backend: siempre responde que no está disponible
     async enviarReportePadres () {
       throw new ErrorApi({ codigo: 'SERVICIO_NO_DISPONIBLE', estado: 501 })

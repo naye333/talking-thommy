@@ -8,8 +8,11 @@ export function crearServicioAutenticacion (cliente) {
     },
 
     // POST /api/auth/registro → 201 { token, usuario }. Solo crea estudiantes; nivel 1 o 2.
-    registrar ({ nombre, correo, contrasena, nivel }) {
-      return cliente.post('/api/auth/registro', { nombre, correo, contrasena, nivel })
+    // codigoGrupo (opcional) deja al estudiante en el grupo de su docente.
+    registrar ({ nombre, correo, contrasena, nivel, codigoGrupo }) {
+      const cuerpo = { nombre, correo, contrasena, nivel }
+      if (codigoGrupo) cuerpo.codigoGrupo = codigoGrupo
+      return cliente.post('/api/auth/registro', cuerpo)
     },
 
     // GET /api/auth/yo → usuario público { id, nombre, correo, rol, nivel, creadoEn }

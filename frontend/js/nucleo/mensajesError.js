@@ -24,6 +24,17 @@ const MENSAJES = {
   TUTOR_NO_DISPONIBLE: 'Thommy todavía no puede responder desde el servidor. Intenta más tarde.',
   SESION_REQUERIDA: 'No se pudo iniciar la conversación. Intenta de nuevo.',
   ERROR_PROCESAMIENTO: 'Thommy no pudo procesar tu audio. Intenta de nuevo.',
+  DEMASIADOS_INTENTOS: 'Demasiados intentos fallidos. Espera 15 minutos e inténtalo de nuevo.',
+  CONTRASENA_INCORRECTA: 'La contraseña actual no es correcta.',
+  CODIGO_GRUPO_INVALIDO: 'No existe un grupo con ese código. Pídeselo de nuevo a tu docente.',
+  SESION_NO_ENCONTRADA: 'Esta conversación ya no está disponible. Empieza una nueva.',
+  TURNO_EN_PROCESO: 'Espera a que Thommy termine de analizar tu frase anterior.',
+  TRANSCRIPCION_VACIA: 'No entendimos lo que dijiste. Habla un poco más fuerte y claro.',
+  FORMATO_AUDIO_NO_SOPORTADO: 'Este dispositivo graba en un formato que no podemos analizar.',
+  IA_NO_DISPONIBLE: 'Thommy no está disponible en este momento. Intenta de nuevo en un rato.',
+  IA_TIEMPO_AGOTADO: 'Thommy tardó demasiado en responder. Intenta de nuevo.',
+  IA_LIMITE_ALCANZADO: 'Thommy está atendiendo a muchos estudiantes. Espera un minuto e inténtalo de nuevo.',
+  IA_RESPUESTA_INVALIDA: 'Thommy no pudo responder esta vez. Intenta de nuevo.',
   ERROR_INTERNO: 'Ocurrió un error inesperado. Intenta de nuevo.'
 }
 

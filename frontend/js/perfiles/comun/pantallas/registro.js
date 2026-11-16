@@ -38,6 +38,7 @@ export function pantallaRegistro ({ contenedor, navegar }, app) {
           <label class="selector-nivel__opcion"><input type="radio" name="nivel" value="2"><span>Inglés II</span></label>
           <p class="campo__error" data-error-de="nivel"></p>
         </fieldset>
+        ${campoConIcono({ id: 'registro-codigo', nombre: 'codigoGrupo', etiqueta: 'Código de grupo de tu docente (opcional)', tipo: 'text', iconoNombre: 'estudiantesTrazo', autocompletar: 'off' })}
         <p class="mensaje-error" role="alert" data-mensaje-general></p>
         <button class="boton-principal" type="submit">Registrarme</button>
       </form>
@@ -56,7 +57,8 @@ export function pantallaRegistro ({ contenedor, navegar }, app) {
       correo: elementos.correo.value.trim().toLowerCase(),
       contrasena: elementos.contrasena.value,
       confirmacion: elementos.confirmacion.value,
-      nivel: Number(elementos.nivel.value)
+      nivel: Number(elementos.nivel.value),
+      codigoGrupo: elementos.codigoGrupo.value.trim()
     }
     const errores = validarFormularioRegistro(datos)
     mostrarErrores(errores)
