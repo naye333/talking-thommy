@@ -1,0 +1,180 @@
+{
+  "_fuente": "Class Planning Format DO-VI-F-016 v04, Inglés I (CEFR A1), semestre 2026-2, Universidad Santo Tomás.",
+  "_nota": "Títulos, semanas, objetivos y gramática salen de la planeación oficial. El vocabulario y las frases modelo son una PROPUESTA del equipo alineada con cada tema y nivel A1: pendientes de validación por el profesor Jhoan Seguro. Se omiten las semanas de exámenes (5-6, 11-12, 16-17), el acuerdo pedagógico (semana 1) y la preparación SABER PRO (semana 15).",
+  "unidades": [
+    {
+      "nivel": 1,
+      "numero": 1,
+      "titulo": "First Term: Personal information",
+      "descripcion": "Alfabeto, información personal, presentarse e intercambiar datos al conocer personas. Incluye speaking test del primer corte.",
+      "temas": [
+        {
+          "numero": 1,
+          "semana": 1,
+          "titulo": "The alphabet and spelling",
+          "objetivo": "Practicar el alfabeto, las mayúsculas y minúsculas y deletrear palabras; repasar números, colores, objetos cotidianos y el nombre.",
+          "gramatica": ["The alphabet", "Uppercase and lowercase letters", "Spelling", "Numbers, colors and everyday objects"],
+          "vocabulario": ["letter", "spell", "name", "number", "color", "pen", "notebook", "repeat"],
+          "frasesModelo": [
+            "How do you spell your name?",
+            "My name is Sara. S, A, R, A.",
+            "What color is your notebook?",
+            "The pen is blue.",
+            "Can you repeat that, please?"
+          ]
+        },
+        {
+          "numero": 2,
+          "semana": 2,
+          "titulo": "Giving and asking for personal information",
+          "objetivo": "Describir y pedir información personal básica, como al llenar una solicitud de visa.",
+          "gramatica": ["Be: positive and negative", "Be: questions and short answers", "Countries and nationalities"],
+          "vocabulario": ["country", "nationality", "Colombian", "from", "single", "married", "address", "student"],
+          "frasesModelo": [
+            "I am from Colombia. I am Colombian.",
+            "Are you a student? Yes, I am.",
+            "She is not from Brazil.",
+            "Where are you from?",
+            "Is he Mexican? No, he isn't."
+          ]
+        },
+        {
+          "numero": 3,
+          "semana": 3,
+          "titulo": "Introducing yourself",
+          "objetivo": "Presentarse y presentar a otros usando adjetivos y el vocabulario estudiado.",
+          "gramatica": ["Adjectives", "Introducing yourself and others"],
+          "vocabulario": ["introduce", "meet", "friendly", "funny", "tall", "young", "intelligent", "classmate"],
+          "frasesModelo": [
+            "Hi, let me introduce myself.",
+            "I am friendly and funny.",
+            "This is my classmate, Ana.",
+            "Nice to meet you.",
+            "My best friend is tall and intelligent."
+          ]
+        },
+        {
+          "numero": 4,
+          "semana": 4,
+          "titulo": "Exchanging information when meeting people",
+          "objetivo": "Identificar y preguntar la nacionalidad, ocupación y país de personas famosas y de compañeros.",
+          "gramatica": ["Question words", "Exchanging basic personal information"],
+          "vocabulario": ["who", "what", "where", "occupation", "famous", "singer", "actor", "common"],
+          "frasesModelo": [
+            "Who is your favorite singer?",
+            "What is her occupation? She is an actress.",
+            "Where is he from?",
+            "How old is your teacher?",
+            "What do we have in common?"
+          ]
+        }
+      ]
+    },
+    {
+      "nivel": 1,
+      "numero": 2,
+      "titulo": "Second Term: Jobs, routines and belongings",
+      "descripcion": "Profesiones, rutinas diarias, adverbios de frecuencia y pertenencias personales. Incluye speaking test del segundo corte.",
+      "temas": [
+        {
+          "numero": 1,
+          "semana": 7,
+          "titulo": "Professions and their duties",
+          "objetivo": "Describir las responsabilidades de diferentes profesiones.",
+          "gramatica": ["Present simple: positive and negative", "Jobs"],
+          "vocabulario": ["doctor", "nurse", "engineer", "lawyer", "teacher", "works", "helps", "hospital"],
+          "frasesModelo": [
+            "A nurse works in a hospital.",
+            "She helps sick people.",
+            "An engineer doesn't work in a school.",
+            "My father is a lawyer.",
+            "I want to be a software engineer."
+          ]
+        },
+        {
+          "numero": 2,
+          "semana": 8,
+          "titulo": "Daily routines",
+          "objetivo": "Intercambiar información sobre las rutinas del día entre semana y los fines de semana.",
+          "gramatica": ["Present simple: questions and short answers", "Time expressions", "Common verbs"],
+          "vocabulario": ["wake up", "breakfast", "lunch", "o'clock", "weekdays", "weekend", "finish", "afternoon"],
+          "frasesModelo": [
+            "What time do you wake up?",
+            "I wake up at six o'clock.",
+            "Do you work on weekends? No, I don't.",
+            "She has lunch at noon.",
+            "I finish class at four in the afternoon."
+          ]
+        },
+        {
+          "numero": 3,
+          "semana": 9,
+          "titulo": "Writing my daily routine",
+          "objetivo": "Contar la propia rutina diaria como estudiante.",
+          "gramatica": ["Adverbs of frequency"],
+          "vocabulario": ["always", "usually", "often", "sometimes", "rarely", "never", "every", "routine"],
+          "frasesModelo": [
+            "I always take the bus to the university.",
+            "She usually studies in the library.",
+            "We sometimes play football on Fridays.",
+            "He never eats breakfast.",
+            "How often do you exercise?"
+          ]
+        },
+        {
+          "numero": 4,
+          "semana": 10,
+          "titulo": "Personal belongings",
+          "objetivo": "Identificar y expresar pertenencias personales en casa y en la universidad, y comparar sus características.",
+          "gramatica": ["Possessive adjectives", "Possessive pronouns"],
+          "vocabulario": ["phone", "laptop", "car", "backpack", "mine", "yours", "brand", "whose"],
+          "frasesModelo": [
+            "This is my phone. It is mine.",
+            "Is this laptop yours?",
+            "Her car is red and small.",
+            "Their backpacks are black.",
+            "Whose phone is this?"
+          ]
+        }
+      ]
+    },
+    {
+      "nivel": 1,
+      "numero": 3,
+      "titulo": "Third Term: Food and eating habits",
+      "descripcion": "Hablar de comida, cantidades, recetas y hábitos alimenticios.",
+      "temas": [
+        {
+          "numero": 1,
+          "semana": 13,
+          "titulo": "Food in the fridge",
+          "objetivo": "Listar y describir todo tipo de comida que hay en la nevera.",
+          "gramatica": ["Countable and uncountable nouns", "A / an / some / any", "There is / there are", "Articles and plurals"],
+          "vocabulario": ["apple", "eggs", "milk", "cheese", "bread", "vegetables", "fridge", "some"],
+          "frasesModelo": [
+            "There is some milk in the fridge.",
+            "There are three eggs.",
+            "Is there any cheese?",
+            "There aren't any apples.",
+            "I have an orange and some bread."
+          ]
+        },
+        {
+          "numero": 2,
+          "semana": 14,
+          "titulo": "Cooking and eating habits",
+          "objetivo": "Identificar buenos y malos hábitos alimenticios y describir los ingredientes de la receta favorita.",
+          "gramatica": ["How much / How many", "Quantifiers: much, many, a lot of, a few, a little"],
+          "vocabulario": ["recipe", "ingredients", "sugar", "salt", "healthy", "junk food", "a few", "a little"],
+          "frasesModelo": [
+            "How much sugar do you eat?",
+            "How many eggs do you need?",
+            "I eat a lot of vegetables.",
+            "Add a little salt and a few tomatoes.",
+            "Eating junk food every day is a bad habit."
+          ]
+        }
+      ]
+    }
+  ]
+}

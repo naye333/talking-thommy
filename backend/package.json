@@ -1,0 +1,51 @@
+{
+  "name": "talking-thommy-backend",
+  "version": "0.1.0",
+  "description": "API REST y servidor WebSocket de Talking Thommy",
+  "main": "src/servidor.js",
+  "scripts": {
+    "start": "node src/servidor.js",
+    "dev": "node --watch src/servidor.js",
+    "test": "jest --coverage",
+    "lint": "standard",
+    "migrar": "node src/bd/migrar.js",
+    "crear-docente": "node src/bd/crearDocente.js",
+    "sembrar-syllabus": "node src/bd/sembrarSyllabus.js",
+    "asignar-docente": "node src/bd/asignarDocente.js",
+    "restablecer-contrasena": "node src/bd/restablecerContrasena.js",
+    "medir-calidad": "node src/herramientas/medirCalidad.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cmu-pronouncing-dictionary": "^2.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.5.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.13.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "standard": "^17.1.2",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coverageThreshold": {
+      "global": {
+        "lines": 80
+      }
+    }
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ]
+  }
+}

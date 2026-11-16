@@ -1,0 +1,60 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    // Fija las versiones de los plugins (archivo buildscript-gradle.lockfile)
+    configurations.classpath {
+        resolutionStrategy.activateDependencyLocking()
+    }
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.7.2'
+        classpath 'com.google.gms:google-services:4.4.2'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+apply from: "variables.gradle"
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    // Versiones de dependencias predecibles: cada módulo guarda las suyas en gradle.lockfile.
+    // Para generarlos o actualizarlos (desde frontend/android): ./gradlew escribirLocks --write-locks
+    dependencyLocking {
+        lockAllConfigurations()
+    }
+
+    // Resuelve las configuraciones de compilación y ejecución del módulo para que --write-locks
+    // escriba su lockfile. Las configuraciones internas del plugin de Android que no se pueden
+    // resolver de forma directa (ambiguas) se omiten.
+    tasks.register('escribirLocks') {
+        notCompatibleWithConfigurationCache('Filtra las configuraciones al ejecutarse')
+        doFirst {
+            assert gradle.startParameter.writeDependencyLocks : "$path se ejecuta con --write-locks"
+        }
+        doLast {
+            configurations
+                .findAll { it.canBeResolved && it.name ==~ /(?i).*(compileclasspath|runtimeclasspath)$/ }
+                .each { configuracion ->
+                    try {
+                        configuracion.resolve()
+                    } catch (Exception error) {
+                        logger.warn("escribirLocks: se omite ${configuracion.name} (${error.message?.readLines()?.first()})")
+                    }
+                }
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

@@ -12,6 +12,8 @@
 
 # Package Files #
 *.jar
+# El wrapper de Gradle sí se sube: sin él, gradlew no funciona
+!frontend/android/gradle/wrapper/gradle-wrapper.jar
 *.war
 *.nar
 *.ear
