@@ -1,12 +1,19 @@
 // Carga (o actualiza) el syllabus desde un archivo JSON. Se puede ejecutar varias veces.
-// Uso: npm run sembrar-syllabus                       → carga semillas/syllabus-ingles-1.json
-//      npm run sembrar-syllabus -- ruta/a/otro.json   → carga otro archivo (por ejemplo, Inglés II)
+// Uso: npm run sembrar-syllabus                       → carga todos los semillas/syllabus-*.json (Inglés I y II)
+//      npm run sembrar-syllabus -- ruta/a/otro.json   → carga solo ese archivo
 const fs = require('fs')
 const path = require('path')
 const { obtenerPool, cerrarPool } = require('../config/baseDatos')
 const { validarSyllabus } = require('../validaciones/validacionesSyllabus')
 
-const ARCHIVO_POR_DEFECTO = path.join(__dirname, 'semillas', 'syllabus-ingles-1.json')
+const CARPETA_SEMILLAS = path.join(__dirname, 'semillas')
+
+function archivosPorDefecto () {
+  return fs.readdirSync(CARPETA_SEMILLAS)
+    .filter((archivo) => /^syllabus-.*\.json$/.test(archivo))
+    .sort()
+    .map((archivo) => path.join(CARPETA_SEMILLAS, archivo))
+}
 
 async function guardarUnidad (cliente, unidad) {
   const { rows } = await cliente.query(
@@ -34,7 +41,7 @@ async function guardarUnidad (cliente, unidad) {
   return unidad.temas.length
 }
 
-async function sembrarSyllabus (rutaArchivo = ARCHIVO_POR_DEFECTO) {
+async function sembrarSyllabus (rutaArchivo) {
   const datos = JSON.parse(fs.readFileSync(rutaArchivo, 'utf8'))
   const errores = validarSyllabus(datos)
   if (errores.length > 0) {
@@ -59,7 +66,12 @@ async function sembrarSyllabus (rutaArchivo = ARCHIVO_POR_DEFECTO) {
   }
 }
 
-sembrarSyllabus(process.argv[2])
+async function sembrarTodo (rutaArchivo) {
+  const archivos = rutaArchivo ? [rutaArchivo] : archivosPorDefecto()
+  for (const archivo of archivos) await sembrarSyllabus(archivo)
+}
+
+sembrarTodo(process.argv[2])
   .finally(cerrarPool)
   .catch((error) => {
     console.error('[syllabus] ERROR:', error.message)

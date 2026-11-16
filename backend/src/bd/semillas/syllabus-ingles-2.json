@@ -1,0 +1,277 @@
+{
+  "_fuente": "PROPUESTA del equipo para Inglés II (CEFR A2). NO proviene de la planeación oficial.",
+  "_nota": "Pendiente de reemplazar con la planeación oficial de Inglés II del profesor Jhoan Segura. Mantiene la misma estructura que syllabus-ingles-1.json (3 cortes) y evita las semanas de exámenes (5-6, 11-12, 16-17), la semana 1 y la 15, igual que Inglés I.",
+  "unidades": [
+    {
+      "nivel": 2,
+      "numero": 1,
+      "titulo": "First Term: Everyday life",
+      "descripcion": "Rutinas, gustos y comida: hablar del día a día con presente simple.",
+      "temas": [
+        {
+          "numero": 1,
+          "semana": 2,
+          "titulo": "Daily routines",
+          "objetivo": "Describir la rutina diaria y la de otras personas, con la frecuencia de cada actividad.",
+          "gramatica": [
+            "Present simple: affirmative, negative and questions",
+            "Adverbs of frequency",
+            "Telling the time"
+          ],
+          "vocabulario": [
+            "wake up",
+            "get up",
+            "have breakfast",
+            "usually",
+            "always",
+            "never",
+            "sometimes",
+            "every day"
+          ],
+          "frasesModelo": [
+            "I usually wake up at six o'clock.",
+            "She never has breakfast at home.",
+            "What time do you get up?",
+            "He always takes the bus to university.",
+            "Do you study every day? Yes, I do."
+          ]
+        },
+        {
+          "numero": 2,
+          "semana": 3,
+          "titulo": "Free time and hobbies",
+          "objetivo": "Hablar de pasatiempos y de lo que le gusta o no le gusta hacer.",
+          "gramatica": [
+            "Like, love, hate + -ing",
+            "Can for ability"
+          ],
+          "vocabulario": [
+            "hobby",
+            "free time",
+            "play",
+            "watch",
+            "swim",
+            "dance",
+            "favorite",
+            "weekend"
+          ],
+          "frasesModelo": [
+            "I love playing soccer on weekends.",
+            "She hates watching horror movies.",
+            "What do you do in your free time?",
+            "Can you swim? No, I can't.",
+            "My favorite hobby is dancing."
+          ]
+        },
+        {
+          "numero": 3,
+          "semana": 4,
+          "titulo": "Food and drinks",
+          "objetivo": "Pedir comida y hablar de cantidades en un restaurante o en el mercado.",
+          "gramatica": [
+            "Countable and uncountable nouns",
+            "Some and any",
+            "How much and how many"
+          ],
+          "vocabulario": [
+            "rice",
+            "chicken",
+            "vegetables",
+            "water",
+            "bread",
+            "some",
+            "any",
+            "menu"
+          ],
+          "frasesModelo": [
+            "I would like some chicken and rice, please.",
+            "Is there any water in the fridge?",
+            "How much bread do we need?",
+            "How many eggs do you want?",
+            "Can I see the menu, please?"
+          ]
+        }
+      ]
+    },
+    {
+      "nivel": 2,
+      "numero": 2,
+      "titulo": "Second Term: Places and past events",
+      "descripcion": "Describir lugares y contar lo que pasó el fin de semana.",
+      "temas": [
+        {
+          "numero": 1,
+          "semana": 7,
+          "titulo": "Places in town",
+          "objetivo": "Describir la ciudad y dar indicaciones sencillas.",
+          "gramatica": [
+            "There is and there are",
+            "Prepositions of place",
+            "Imperatives for directions"
+          ],
+          "vocabulario": [
+            "bank",
+            "supermarket",
+            "park",
+            "hospital",
+            "next to",
+            "between",
+            "opposite",
+            "turn left"
+          ],
+          "frasesModelo": [
+            "There is a bank next to the park.",
+            "There are two supermarkets on my street.",
+            "Turn left and go straight.",
+            "The hospital is opposite the church.",
+            "Is there a pharmacy near here?"
+          ]
+        },
+        {
+          "numero": 2,
+          "semana": 8,
+          "titulo": "What are you doing now?",
+          "objetivo": "Describir lo que las personas están haciendo en este momento.",
+          "gramatica": [
+            "Present continuous",
+            "Present simple vs present continuous"
+          ],
+          "vocabulario": [
+            "right now",
+            "at the moment",
+            "studying",
+            "cooking",
+            "talking",
+            "waiting",
+            "working",
+            "listening"
+          ],
+          "frasesModelo": [
+            "I am studying English right now.",
+            "She is cooking dinner at the moment.",
+            "What are you doing?",
+            "They are waiting for the bus.",
+            "He is not working today."
+          ]
+        },
+        {
+          "numero": 3,
+          "semana": 9,
+          "titulo": "Last weekend",
+          "objetivo": "Contar lo que hizo el fin de semana pasado.",
+          "gramatica": [
+            "Past simple of be: was and were",
+            "Past simple: regular verbs",
+            "Time expressions: yesterday, last weekend, ago"
+          ],
+          "vocabulario": [
+            "yesterday",
+            "last",
+            "ago",
+            "visited",
+            "watched",
+            "played",
+            "stayed",
+            "was"
+          ],
+          "frasesModelo": [
+            "Last weekend I visited my grandparents.",
+            "Yesterday I watched a movie at home.",
+            "Were you at the party? Yes, I was.",
+            "We played basketball two days ago.",
+            "She stayed at home on Sunday."
+          ]
+        }
+      ]
+    },
+    {
+      "nivel": 2,
+      "numero": 3,
+      "titulo": "Third Term: Stories, plans and comparisons",
+      "descripcion": "Contar experiencias, hablar de planes y comparar.",
+      "temas": [
+        {
+          "numero": 1,
+          "semana": 10,
+          "titulo": "Life stories",
+          "objetivo": "Contar experiencias y momentos importantes de la vida.",
+          "gramatica": [
+            "Past simple: irregular verbs",
+            "Past simple questions and negatives"
+          ],
+          "vocabulario": [
+            "went",
+            "had",
+            "saw",
+            "met",
+            "born",
+            "grew up",
+            "moved",
+            "became"
+          ],
+          "frasesModelo": [
+            "I was born in Villavicencio.",
+            "I went to the beach last year.",
+            "Did you meet your best friend at school?",
+            "She didn't see the message.",
+            "We moved to Bogotá in 2020."
+          ]
+        },
+        {
+          "numero": 2,
+          "semana": 13,
+          "titulo": "Future plans",
+          "objetivo": "Hablar de planes e intenciones para el futuro.",
+          "gramatica": [
+            "Be going to for plans",
+            "Future time expressions"
+          ],
+          "vocabulario": [
+            "plan",
+            "next",
+            "tomorrow",
+            "travel",
+            "going to",
+            "vacation",
+            "graduate",
+            "future"
+          ],
+          "frasesModelo": [
+            "I am going to travel to Cartagena next month.",
+            "What are you going to do tomorrow?",
+            "She is going to graduate next year.",
+            "We are not going to work on Sunday.",
+            "My plan is to learn English very well."
+          ]
+        },
+        {
+          "numero": 3,
+          "semana": 14,
+          "titulo": "Comparing things",
+          "objetivo": "Comparar personas, lugares y objetos.",
+          "gramatica": [
+            "Comparative adjectives",
+            "Superlative adjectives"
+          ],
+          "vocabulario": [
+            "bigger",
+            "smaller",
+            "more expensive",
+            "cheaper",
+            "the best",
+            "the worst",
+            "than",
+            "most"
+          ],
+          "frasesModelo": [
+            "My city is bigger than my town.",
+            "This phone is more expensive than that one.",
+            "Who is the tallest person in your family?",
+            "Summer is the best season of the year.",
+            "The bus is cheaper than a taxi."
+          ]
+        }
+      ]
+    }
+  ]
+}
