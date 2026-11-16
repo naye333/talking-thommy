@@ -5,6 +5,9 @@ const entorno = require('./config/entorno')
 const rutasSalud = require('./rutas/salud')
 const rutasAutenticacion = require('./rutas/autenticacion')
 const rutasSyllabus = require('./rutas/syllabus')
+const rutasSesiones = require('./rutas/sesiones')
+const rutasEstudiante = require('./rutas/estudiante')
+const rutasDocente = require('./rutas/docente')
 
 function crearApp () {
   const app = express()
@@ -18,7 +21,9 @@ function crearApp () {
   app.use('/api/salud', rutasSalud)
   app.use('/api/auth', rutasAutenticacion)
   app.use('/api/syllabus', rutasSyllabus)
-  // Próximas rutas: /api/sesiones, /api/reportes
+  app.use('/api/sesiones', rutasSesiones)
+  app.use('/api/estudiante', rutasEstudiante)
+  app.use('/api/docente', rutasDocente)
 
   // Ruta no encontrada
   app.use((_request, response) => {
