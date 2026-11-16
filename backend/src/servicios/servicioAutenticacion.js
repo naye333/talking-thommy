@@ -7,6 +7,8 @@ const servicioGrupos = require('./servicioGrupos')
 const { crearError } = require('../utilidades/errores')
 
 const RONDAS_CIFRADO = 10
+// Algoritmo fijo: verify rechaza tokens firmados con otro (por ejemplo, "none")
+const ALGORITMO_JWT = 'HS256'
 
 function cifrarContrasena (contrasena) {
   return bcrypt.hash(contrasena, RONDAS_CIFRADO)
@@ -16,14 +18,14 @@ function generarToken (usuario) {
   return jwt.sign(
     { rol: usuario.rol, nivel: usuario.nivel },
     entorno.jwtSecreto,
-    { subject: String(usuario.id), expiresIn: entorno.jwtExpiracion }
+    { subject: String(usuario.id), expiresIn: entorno.jwtExpiracion, algorithm: ALGORITMO_JWT }
   )
 }
 
 // Devuelve { id, rol, nivel } o lanza TOKEN_INVALIDO
 function verificarToken (token) {
   try {
-    const datos = jwt.verify(token, entorno.jwtSecreto)
+    const datos = jwt.verify(token, entorno.jwtSecreto, { algorithms: [ALGORITMO_JWT] })
     return { id: Number(datos.sub), rol: datos.rol, nivel: datos.nivel }
   } catch {
     throw crearError(401, 'TOKEN_INVALIDO')

@@ -66,3 +66,15 @@ describe('medirCalidad', () => {
     await expect(medirCalidad([carpeta])).rejects.toThrow(/al menos un caso/)
   })
 })
+
+describe('medirCalidad (rutas de audio)', () => {
+  test('rechaza nombres de audio con rutas', async () => {
+    const carpeta = fs.mkdtempSync(path.join(os.tmpdir(), 'calidad-'))
+    fs.writeFileSync(path.join(carpeta, 'casos.json'), JSON.stringify([{ audio: '../secreto.txt', texto: 'Hi.' }]))
+    jest.spyOn(console, 'log').mockImplementation(() => {})
+    const { resultados } = await medirCalidad([carpeta])
+    expect(resultados[0].error).toMatch(/solo el nombre/)
+    fs.rmSync(carpeta, { recursive: true, force: true })
+    jest.restoreAllMocks()
+  })
+})

@@ -20,8 +20,16 @@ function leerCasos (carpeta) {
   return casos
 }
 
+// Solo nombres de archivo dentro de la carpeta de casos (sin rutas como ../../otro)
+function rutaAudio (carpeta, nombre) {
+  if (typeof nombre !== 'string' || nombre !== path.basename(nombre)) {
+    throw new Error(`"${nombre}" debe ser solo el nombre de un archivo de la carpeta`)
+  }
+  return path.join(path.resolve(carpeta), nombre)
+}
+
 async function medirCaso (carpeta, caso, conTutor) {
-  const audio = fs.readFileSync(path.join(carpeta, caso.audio))
+  const audio = fs.readFileSync(rutaAudio(carpeta, caso.audio))
   const inicio = Date.now()
   const transcripcion = await transcribirAudio(audio)
   const latenciaTranscripcionMs = Date.now() - inicio
