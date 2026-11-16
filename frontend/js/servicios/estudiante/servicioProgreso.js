@@ -1,12 +1,22 @@
 // Progreso del estudiante que inició sesión.
-// DATOS DE EJEMPLO: mientras no exista GET /api/estudiante/progreso (ver docs/contrato-api-perfil-estudiante.md),
-// muestra los datos ficticios de una estudiante del perfil docente para no duplicarlos.
+// Con usarDatosEjemplo: false y un cliente usa GET /api/estudiante/progreso (backend real).
+// Con usarDatosEjemplo: true muestra los datos ficticios de una estudiante del perfil docente.
 import { ErrorApi } from '../../nucleo/clienteApi.js'
 import { crearServicioDocente } from '../docente/servicioDocente.js'
 
 const ESTUDIANTE_EJEMPLO = 1
 
-export function crearServicioProgreso ({ usarDatosEjemplo, demoraMs }) {
+export function crearServicioProgreso ({ usarDatosEjemplo, demoraMs, cliente = null }) {
+  if (!usarDatosEjemplo && cliente) {
+    return {
+      capacidades: { datosEjemplo: false },
+      obtenerProgreso ({ periodo } = {}) {
+        const consulta = periodo ? `?periodo=${encodeURIComponent(periodo)}` : ''
+        return cliente.get(`/api/estudiante/progreso${consulta}`)
+      }
+    }
+  }
+
   const ejemplo = crearServicioDocente({ usarDatosEjemplo, demoraMs })
 
   return {

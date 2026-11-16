@@ -33,9 +33,9 @@ const app = {
   sesion,
   servicios: {
     autenticacion: crearServicioAutenticacion(cliente),
-    docente: crearServicioDocente({ usarDatosEjemplo: configuracion.usarDatosEjemploDocente }),
+    docente: crearServicioDocente({ usarDatosEjemplo: configuracion.usarDatosEjemploDocente, cliente }),
     syllabus: crearServicioSyllabus(cliente),
-    progreso: crearServicioProgreso({ usarDatosEjemplo: configuracion.usarDatosEjemploProgreso }),
+    progreso: crearServicioProgreso({ usarDatosEjemplo: configuracion.usarDatosEjemploProgreso, cliente }),
     conversacion: crearServicioConversacion({
       modo: configuracion.modoConversacion,
       cliente,

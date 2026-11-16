@@ -1,10 +1,10 @@
 // Servicio de datos del perfil docente. Las pantallas solo usan esta interfaz.
 //
-// Hoy responde con datos de ejemplo porque el backend no tiene estos endpoints.
-// Cuando existan (ver docs/propuesta-api-perfil-docente.md), se reemplaza la implementación de cada
-// método por una llamada al cliente de la API, sin tocar las pantallas.
+// Con usarDatosEjemplo: false y un cliente de la API, usa el backend real (servicioDocenteApi.js).
+// Con usarDatosEjemplo: true responde con datos de ejemplo, útiles para probar la interfaz sin backend.
 import { ErrorApi } from '../../nucleo/clienteApi.js'
 import { normalizarTexto } from '../../nucleo/dom.js'
+import { crearServicioDocenteApi } from './servicioDocenteApi.js'
 import { AREAS, ESTUDIANTES, FALENCIAS_POR_AREA, AJUSTES_POR_PERIODO } from './datosEjemplo.js'
 
 export const PERIODOS = [
@@ -59,7 +59,9 @@ function calcularFalencias (estudiante) {
     .sort((a, b) => a.porcentaje - b.porcentaje)
 }
 
-export function crearServicioDocente ({ usarDatosEjemplo, demoraMs = 220 } = {}) {
+export function crearServicioDocente ({ usarDatosEjemplo, demoraMs = 220, cliente = null } = {}) {
+  if (!usarDatosEjemplo && cliente) return crearServicioDocenteApi(cliente)
+
   const recomendacionesPorEstudiante = new Map()
   let contadorRecomendaciones = 0
 
