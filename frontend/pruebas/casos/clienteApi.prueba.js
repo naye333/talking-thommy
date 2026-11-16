@@ -17,7 +17,7 @@ describir('clienteApi', (prueba) => {
   prueba('envía el token y el cuerpo JSON', async () => {
     let solicitud
     const cliente = crearClienteApi({
-      urlBase: 'http://api',
+      urlBase: 'https://api',
       obtenerToken: () => 'abc',
       fetchImpl: async (url, opciones) => {
         solicitud = { url, opciones }
@@ -26,7 +26,7 @@ describir('clienteApi', (prueba) => {
     })
     const datos = await cliente.post('/api/auth/ingreso', { correo: 'a@b.co' })
     afirmar.profundo(datos, { ok: true })
-    afirmar.igual(solicitud.url, 'http://api/api/auth/ingreso')
+    afirmar.igual(solicitud.url, 'https://api/api/auth/ingreso')
     afirmar.igual(solicitud.opciones.method, 'POST')
     afirmar.igual(solicitud.opciones.headers.Authorization, 'Bearer abc')
     afirmar.igual(solicitud.opciones.body, '{"correo":"a@b.co"}')

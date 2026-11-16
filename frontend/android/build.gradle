@@ -1,7 +1,11 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    
+    // Fija las versiones de los plugins (archivo buildscript-gradle.lockfile)
+    configurations.classpath {
+        resolutionStrategy.activateDependencyLocking()
+    }
+
     repositories {
         google()
         mavenCentral()
@@ -21,6 +25,24 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+
+    // Versiones de dependencias predecibles: cada módulo guarda las suyas en gradle.lockfile.
+    // Para generarlos o actualizarlos (desde frontend/android): ./gradlew escribirLocks --write-locks
+    dependencyLocking {
+        lockAllConfigurations()
+    }
+
+    // Patrón de la documentación de Gradle ("Locking dependency versions"): resuelve todas las
+    // configuraciones del módulo para que --write-locks escriba su lockfile
+    tasks.register('escribirLocks') {
+        notCompatibleWithConfigurationCache('Filtra las configuraciones al ejecutarse')
+        doFirst {
+            assert gradle.startParameter.writeDependencyLocks : "$path se ejecuta con --write-locks"
+        }
+        doLast {
+            configurations.findAll { it.canBeResolved }.each { it.resolve() }
+        }
     }
 }
 

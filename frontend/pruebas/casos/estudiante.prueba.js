@@ -76,7 +76,7 @@ describir('estudiante', (prueba) => {
   prueba('el cliente de tiempo real sigue el protocolo y devuelve resultado_turno', async () => {
     const resultado = { tipo: 'resultado_turno', transcripcion: 'hola', evaluacion: {}, respuesta: {} }
     const { WebSocketFalso, enviados } = crearWebSocketFalso([{ tipo: 'procesando' }, resultado])
-    const cliente = crearClienteTiempoReal({ url: 'ws://x', WebSocketImpl: WebSocketFalso })
+    const cliente = crearClienteTiempoReal({ url: 'wss://x', WebSocketImpl: WebSocketFalso })
     await cliente.conectar()
     cliente.iniciarTurno()
     cliente.enviarAudio(new Uint8Array([1, 2]))
@@ -88,7 +88,7 @@ describir('estudiante', (prueba) => {
 
   prueba('un error del servidor rechaza el turno con su código', async () => {
     const { WebSocketFalso } = crearWebSocketFalso([{ tipo: 'error', codigo: 'AUDIO_VACIO' }])
-    const cliente = crearClienteTiempoReal({ url: 'ws://x', WebSocketImpl: WebSocketFalso })
+    const cliente = crearClienteTiempoReal({ url: 'wss://x', WebSocketImpl: WebSocketFalso })
     await cliente.conectar()
     cliente.iniciarTurno()
     await afirmar.rechaza(cliente.finalizarTurno(), 'AUDIO_VACIO')
@@ -97,7 +97,7 @@ describir('estudiante', (prueba) => {
   prueba('en tiempo real, el backend actual sin IA se reporta como TUTOR_NO_DISPONIBLE', async () => {
     const { WebSocketFalso } = crearWebSocketFalso([{ tipo: 'turno_recibido', bytes: 2 }])
     const cliente = { post: async () => ({ sesion: { id: 's1' }, saludo: { texto: 'Hi' } }) }
-    const servicio = crearServicioConversacion({ modo: 'tiempoReal', cliente, urlApi: 'http://x', obtenerToken: () => 't', WebSocketImpl: WebSocketFalso })
+    const servicio = crearServicioConversacion({ modo: 'tiempoReal', cliente, urlApi: 'https://x', obtenerToken: () => 't', WebSocketImpl: WebSocketFalso })
     const sesion = await servicio.iniciar({ tema: TEMA })
     afirmar.verdadero(WebSocketFalso.ultimo.url.includes('sesion=s1'))
     sesion.iniciarTurno()

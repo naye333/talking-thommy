@@ -32,8 +32,18 @@ URL_API=https://<tu-backend> npm run android   # copia la app a www/, sincroniza
 En Android Studio, pulsa **Run** con un emulador o con un celular conectado por USB.
 
 - `URL_API` es la URL del backend que usará la app. Si no la pasas, se usa la de [`js/config.js`](js/config.js) (`http://localhost:3000`), que **no funciona dentro del celular**. En PowerShell, primero escribe `$env:URL_API="https://..."` y luego `npm run android`.
-- Lo más simple es usar el backend desplegado en Render (HTTPS). Para usar el backend de tu PC desde el emulador, la URL es `http://10.0.2.2:3000`. Como es HTTP, en `android/app/src/main/AndroidManifest.xml` agrega `android:usesCleartextTraffic="true"` a `<application>` (solo para desarrollo).
+- Lo más simple es usar el backend desplegado en Render (HTTPS). Para usar el backend de tu PC desde el emulador, la URL es `http://10.0.2.2:3000`. Como es HTTP, en `android/app/src/main/AndroidManifest.xml` cambia `android:usesCleartextTraffic="false"` por `"true"` en `<application>` **solo en tu PC y sin subir ese cambio**: en el repositorio debe quedar en `false`.
 - Las peticiones a la API salen por la capa nativa (`CapacitorHttp` en `capacitor.config.json`), así que el backend no necesita configurar CORS para la app.
+
+### Versiones fijas de las dependencias de Android
+
+El proyecto Android usa *dependency locking*: las versiones exactas quedan en los archivos `gradle.lockfile`, así todas las compilaciones usan las mismas. Cuando se agrega o actualiza un plugin de Capacitor, se regeneran desde `frontend/android` con:
+
+```bash
+./gradlew escribirLocks --write-locks
+```
+
+En Windows (PowerShell): `.\gradlew.bat escribirLocks --write-locks`. Después se suben los `*.lockfile` generados.
 
 ## Estado de la integración con el backend
 
