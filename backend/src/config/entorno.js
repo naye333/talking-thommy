@@ -21,7 +21,11 @@ const entorno = {
     .filter(Boolean),
   maxBytesAudioTurno: Number(process.env.MAX_BYTES_AUDIO_TURNO) || 25 * 1024 * 1024,
   jwtSecreto,
-  jwtExpiracion: process.env.JWT_EXPIRACION || '7d'
+  jwtExpiracion: process.env.JWT_EXPIRACION || '7d',
+  // Servicio de IA (carpeta ia/): Whisper + Ollama + Piper. Solo el backend habla con él, nunca la app.
+  urlServicioIa: (process.env.URL_SERVICIO_IA || 'http://127.0.0.1:8000').replace(/\/$/, ''),
+  claveServicioIa: process.env.CLAVE_SERVICIO_IA || '',
+  tiempoMaximoIaMs: Number(process.env.TIEMPO_MAXIMO_IA_MS) || 90000
 }
 
 module.exports = entorno

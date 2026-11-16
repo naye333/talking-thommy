@@ -2,6 +2,7 @@ const { WebSocketServer } = require('ws')
 const { BufferAudio } = require('./bufferAudio')
 const entorno = require('../config/entorno')
 const { verificarToken } = require('../servicios/servicioAutenticacion')
+const servicioSesiones = require('../servicios/servicioSesiones')
 
 const RUTA_TIEMPO_REAL = '/tiempo-real'
 const INTERVALO_LATIDO_MS = 30000
@@ -12,9 +13,9 @@ function enviarMensaje (socket, mensaje) {
   }
 }
 
-// Punto de extensión: aquí se conectarán Whisper, el análisis fonético y el tutor (paso 5)
+// Turno completo con la IA: Whisper (transcripción) → evaluación → Thommy (Ollama) → voz (Piper)
 async function procesarTurno (audio, contexto) {
-  return { tipo: 'turno_recibido', bytes: audio.length, sesionId: contexto.sesionId }
+  return servicioSesiones.procesarTurno({ sesionId: contexto.sesionId, usuarioId: contexto.usuarioId, audio })
 }
 
 function manejarMensajeControl (socket, buffer, datos, contexto) {
@@ -43,8 +44,9 @@ function manejarMensajeControl (socket, buffer, datos, contexto) {
       procesarTurno(audio, contexto)
         .then((resultado) => enviarMensaje(socket, resultado))
         .catch((error) => {
-          console.error('[ws] error procesando turno:', error.message)
-          enviarMensaje(socket, { tipo: 'error', codigo: 'ERROR_PROCESAMIENTO' })
+          // Errores conocidos (AUDIO_NO_ENTENDIDO, TUTOR_NO_DISPONIBLE…) se envían con su código
+          if (!error.codigo) console.error('[ws] error procesando turno:', error.message)
+          enviarMensaje(socket, { tipo: 'error', codigo: error.codigo || 'ERROR_PROCESAMIENTO' })
         })
       return
     }
@@ -71,7 +73,14 @@ function manejarConexion (socket, request) {
     return socket.close(1008, 'sesion requerida')
   }
 
-  // TODO (feature/sesiones): comprobar que la sesión pertenece a usuario.id
+  // La sesión debe haberse creado con POST /api/sesiones y pertenecer a este estudiante
+  try {
+    servicioSesiones.verificarPropietario(sesionId, usuario.id)
+  } catch (error) {
+    enviarMensaje(socket, { tipo: 'error', codigo: error.codigo })
+    return socket.close(1008, 'sesion no encontrada')
+  }
+
   const contexto = { sesionId, usuarioId: usuario.id }
   const buffer = new BufferAudio(entorno.maxBytesAudioTurno)
   socket.estaVivo = true
