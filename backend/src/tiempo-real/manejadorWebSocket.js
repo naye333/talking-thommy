@@ -1,6 +1,7 @@
 const { WebSocketServer } = require('ws')
 const { BufferAudio } = require('./bufferAudio')
 const entorno = require('../config/entorno')
+const { verificarToken } = require('../servicios/servicioAutenticacion')
 
 const RUTA_TIEMPO_REAL = '/tiempo-real'
 const INTERVALO_LATIDO_MS = 30000
@@ -57,13 +58,21 @@ function manejarConexion (socket, request) {
   const url = new URL(request.url, 'http://localhost')
   const sesionId = url.searchParams.get('sesion')
 
-  // TODO (feature/autenticacion): validar el JWT del parámetro "token"
+  let usuario
+  try {
+    usuario = verificarToken(url.searchParams.get('token') || '')
+  } catch {
+    enviarMensaje(socket, { tipo: 'error', codigo: 'TOKEN_INVALIDO' })
+    return socket.close(1008, 'token invalido')
+  }
+
   if (!sesionId) {
     enviarMensaje(socket, { tipo: 'error', codigo: 'SESION_REQUERIDA' })
     return socket.close(1008, 'sesion requerida')
   }
 
-  const contexto = { sesionId }
+  // TODO (feature/sesiones): comprobar que la sesión pertenece a usuario.id
+  const contexto = { sesionId, usuarioId: usuario.id }
   const buffer = new BufferAudio(entorno.maxBytesAudioTurno)
   socket.estaVivo = true
 
