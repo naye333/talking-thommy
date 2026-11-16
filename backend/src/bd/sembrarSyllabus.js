@@ -1,5 +1,5 @@
 // Carga (o actualiza) el syllabus desde un archivo JSON. Se puede ejecutar varias veces.
-// Uso: npm run sembrar-syllabus                       → carga todos los semillas/syllabus-*.json (Inglés I y II)
+// Uso: npm run sembrar-syllabus                       → carga todos los semillas/syllabus-*.json (hoy, Inglés I)
 //      npm run sembrar-syllabus -- ruta/a/otro.json   → carga solo ese archivo
 const fs = require('fs')
 const path = require('path')

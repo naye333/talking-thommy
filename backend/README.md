@@ -14,7 +14,7 @@ cd backend
 npm install
 cp .env.example .env      # luego pega tu DATABASE_URL de Neon y tu GROQ_API_KEY
 npm run migrar            # crea las tablas en la base de datos
-npm run sembrar-syllabus  # carga el syllabus de Inglés I y la propuesta de Inglés II
+npm run sembrar-syllabus  # carga el syllabus de Inglés I
 npm run crear-docente -- profe@usta.edu.co "Nombre" "contrasena"   # muestra el código de grupo
 npm run dev
 ```
@@ -82,10 +82,8 @@ router.get('/curso', exigirToken, exigirRol('docente'), controlador)
 
 El contenido vive en `src/bd/semillas/`. Según el Acta, no se edita desde la app: para cambiarlo se modifica el JSON y se vuelve a ejecutar `npm run sembrar-syllabus` (actualiza sin duplicar).
 
-- `syllabus-ingles-1.json`: tomado de la planeación oficial de Inglés I (A1, 2026-2), con 3 cortes y 10 temas. El vocabulario y las frases modelo son una propuesta del equipo.
-- `syllabus-ingles-2.json`: **propuesta completa del equipo** para Inglés II (A2), con 3 cortes y 9 temas, para que los estudiantes de nivel 2 puedan practicar. Hay que reemplazarla con la planeación oficial cuando el profesor la entregue: basta con editar el JSON y volver a sembrar.
-
-> Todo el contenido marcado como propuesta está pendiente de validación por el profesor.
+- `syllabus-ingles-1.json`: tomado de la planeación oficial de Inglés I (A1, 2026-2), con 3 cortes y 10 temas. El vocabulario y las frases modelo son una propuesta del equipo, pendiente de validación por el profesor.
+- Inglés II no tiene syllabus cargado: un estudiante de nivel 2 verá las lecciones vacías. Si más adelante se necesita, se crea `syllabus-ingles-2.json` con la misma estructura y `"nivel": 2`, y se ejecuta `npm run sembrar-syllabus`.
 
 | Método | Ruta | Respuesta |
 |---|---|---|

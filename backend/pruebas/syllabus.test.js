@@ -14,7 +14,6 @@ const { crearApp } = require('../src/app')
 const { generarToken } = require('../src/servicios/servicioAutenticacion')
 const { validarSyllabus } = require('../src/validaciones/validacionesSyllabus')
 const syllabusIngles1 = require('../src/bd/semillas/syllabus-ingles-1.json')
-const syllabusIngles2 = require('../src/bd/semillas/syllabus-ingles-2.json')
 
 const app = crearApp()
 const tokenEstudiante = generarToken({ id: 1, rol: 'estudiante', nivel: 1 })
@@ -79,13 +78,6 @@ describe('validarSyllabus', () => {
   test('el syllabus de Inglés I cubre las 10 semanas de clase de la planeación', () => {
     const semanas = syllabusIngles1.unidades.flatMap((unidad) => unidad.temas.map((tema) => tema.semana))
     expect(semanas).toEqual([1, 2, 3, 4, 7, 8, 9, 10, 13, 14])
-  })
-
-  test('la propuesta de Inglés II es válida, de nivel 2 y sin semanas de exámenes', () => {
-    expect(validarSyllabus(syllabusIngles2)).toEqual([])
-    expect(syllabusIngles2.unidades.every((unidad) => unidad.nivel === 2)).toBe(true)
-    const semanas = syllabusIngles2.unidades.flatMap((unidad) => unidad.temas.map((tema) => tema.semana))
-    expect(semanas.some((semana) => [5, 6, 11, 12, 15, 16, 17].includes(semana))).toBe(false)
   })
 
   test('rechaza un archivo sin unidades', () => {

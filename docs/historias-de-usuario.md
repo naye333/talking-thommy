@@ -5,7 +5,7 @@ Historias implementadas, con sus criterios de aceptación y dónde verificarlas.
 | ID | Historia | Módulo del Acta | Estado |
 |---|---|---|---|
 | HU01 | Registro e ingreso | Datos | Implementada |
-| HU02 | Consultar el syllabus | Syllabus | Implementada (Inglés II es propuesta) |
+| HU02 | Consultar el syllabus | Syllabus | Implementada (solo Inglés I) |
 | HU03 | Conversar con Thommy | Tutor IA | Implementada |
 | HU04 | Transcripción y análisis de pronunciación | Pronunciación | Implementada |
 | HU05 | Retroalimentación del turno | Retroalimentación | Implementada |
