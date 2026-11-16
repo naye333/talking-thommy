@@ -1,7 +1,7 @@
 # Contrato API · Perfil estudiante
 
-> **Para el equipo de backend e IA.** El frontend ya está construido sobre este contrato y hoy usa respuestas simuladas. Al implementarlo, basta con cambiar en `frontend/js/config.js`:
-> - `modoConversacion: 'tiempoReal'` → conversación real.
+> **Para el equipo de backend e IA.** El frontend está construido sobre este contrato. La conversación con Thommy ya usa la IA real (`modoConversacion: 'tiempoReal'`, rama `feature/ia-tutor`). En `frontend/js/config.js`:
+> - `modoConversacion: 'tiempoReal'` → conversación real (por defecto); `'ejemplo'` → tutor simulado sin backend.
 > - `usarDatosEjemploProgreso: false` → progreso real.
 > - `usarDatosEjemploDocente: false` → perfil docente real (ver `propuesta-api-perfil-docente.md`).
 
@@ -16,7 +16,7 @@
 
 ## Conversación con Thommy
 
-### 1. Crear la sesión de práctica (nuevo)
+### 1. Crear la sesión de práctica ✅ implementado (`feature/ia-tutor`)
 
 `POST /api/sesiones` · `Authorization: Bearer <token>` · rol `estudiante`
 
@@ -28,13 +28,20 @@
 {
   "sesion": { "id": "abc123" },
   "saludo": {
-    "texto": "Hi! I'm Thommy. Today we will practice \"Introducing yourself\". Try saying this:",
-    "frase": "Hi, let me introduce myself."   // frase que el estudiante debe decir (opcional)
+    "texto": "Hi Ana! I'm Thommy! Today we're going to practice \"Introducing yourself\". This is gonna be awesome! Try saying this:",
+    "frase": "Hi, let me introduce myself.",   // frase que el estudiante debe decir (null en conversación libre)
+    "audioUrl": "data:audio/mpeg;base64,SUQz…" // voz de Thommy diciendo texto + frase
   }
 }
 ```
 
-### 2. WebSocket `/tiempo-real?sesion=<id>&token=<jwt>` (existente, se completa la respuesta)
+- **Con tema** (`temaId`): Thommy pide repetir las `frasesModelo` del tema, en orden. Si el estudiante dice otra cosa, conversa con él y vuelve a la frase. Al terminar las frases, sigue en conversación libre sobre el tema.
+- **Sin tema**: conversación libre; Thommy hace preguntas y corrige la gramática.
+- Errores: `400 DATOS_INVALIDOS` (temaId), `404 TEMA_NO_ENCONTRADO`, `503 TUTOR_NO_DISPONIBLE` (servicio de IA apagado).
+
+### 2. WebSocket `/tiempo-real?sesion=<id>&token=<jwt>` ✅ implementado
+
+La sesión debe haberse creado con `POST /api/sesiones` por el mismo estudiante; si no, el servidor envía `SESION_NO_ENCONTRADA` y cierra.
 
 | Dirección | Mensaje | Estado |
 |---|---|---|
@@ -51,43 +58,54 @@ Para cancelar un turno el cliente no envía nada: el siguiente `inicio_turno` de
 ```json
 {
   "tipo": "resultado_turno",
-  "transcripcion": "Hi, let me introduce myself.",
+  "transcripcion": "Hi, let me in produce myself.",
   "evaluacion": {
-    "puntaje": 68,                       // 0-100
-    "nivel": "practicar",                // "excelente" | "bien" | "practicar"
-    "mensaje": "Casi perfecto. Practica la palabra \"introduce\".",   // en español, para A1
+    "tipo": "frase",                     // "frase" (repitió la frase modelo) | "gramatica" (habló libremente)
+    "etiqueta": "Palabras entendidas",   // nombre del puntaje para mostrar ("Palabras entendidas" | "Gramática")
+    "puntaje": 80,                       // 0-100
+    "nivel": "bien",                     // "excelente" | "bien" | "practicar"
+    "mensaje": "Casi perfecto. Thommy no entendió bien \"introduce\": repítela despacio.",   // en español
     "palabras": [
       { "texto": "Hi,", "correcta": true },
       { "texto": "introduce", "correcta": false, "sugerencia": "Repite despacio: \"introduce\"" }
     ]
   },
   "respuesta": {
-    "texto": "Well done! Now try this one:",   // intervención del tutor, en inglés
-    "frase": "I am friendly and funny.",       // siguiente frase a practicar (opcional)
-    "audioUrl": null                           // opcional: audio del tutor; si falta, el frontend usa la voz del dispositivo
+    "texto": "Good job! Almost perfect! Listen and say it slowly:",   // intervención del tutor, en inglés
+    "frase": "Hi, let me introduce myself.",   // frase a practicar (null en conversación libre)
+    "audioUrl": "data:audio/mpeg;base64,SUQz…"  // voz de Thommy (ver abajo)
+  },
+  "correccion": {                        // opcional: solo si hubo un error de gramática
+    "original": "Yesterday I go to school.",
+    "corregida": "Yesterday I went to school."
   }
 }
 ```
 
-Mientras el backend responda `turno_recibido`, el frontend en modo `tiempoReal` muestra "Thommy todavía no puede responder" (`TUTOR_NO_DISPONIBLE`).
+**Cómo se calcula `evaluacion`** (servicio de IA, `ia/services/practice.py`):
 
-### Audio del tutor (`respuesta.audioUrl`) · ⚠️ pendiente de acordar
+- `tipo: "frase"`: se compara lo que entendió Whisper con la frase que Thommy pidió decir, palabra por palabra.
+  Mide si el sistema **entendió** cada palabra (inteligibilidad). **No es un análisis fonético**: Whisper a veces
+  "corrige" palabras mal pronunciadas, así que el puntaje puede ser generoso. Es una medida provisional hasta
+  tener el evaluador fonético que pide el acta (`ia/services/pronunciation.py` es el punto de extensión).
+- `tipo: "gramatica"`: el estudiante habló libremente; se marcan las palabras que el corrector cambió.
 
-**Lo que ya hace el frontend** (`js/servicios/estudiante/voz.js`): al tocar 🔊 en un mensaje de Thommy, reproduce `audioUrl` si existe; si falta, no carga o el dispositivo bloquea la reproducción, lee el texto con la voz del dispositivo. Acepta URLs absolutas o relativas a `urlApi` y solo `http`/`https`.
+### Audio del tutor (`audioUrl`) · ✅ acordado e implementado
 
-**Falta acordar con backend (Gabriela) e IA (Alisson)** y dejarlo escrito aquí:
+| Tema | Decisión |
+|---|---|
+| Formato | **MP3** mono 64 kbps (~8 KB por segundo de voz). Se reproduce en Chrome, el WebView de Android y iOS. |
+| Tipo de URL | **Audio embebido** (`data:audio/mpeg;base64,…`) dentro del mismo mensaje. No hay URL que vencer, no necesita token ni otra petición, y no hay problema de contenido mixto en `https://localhost` (Android). |
+| Contenido | El audio dice **`texto` + `frase`**, igual que la voz del dispositivo. |
+| Saludo | `saludo.audioUrl` de `POST /api/sesiones` también trae la voz. |
+| Voz | Voz infantil de Thommy (Piper `en_US-kristin-medium` con el tono subido). Se configura en `ia/.env`. |
+| Reproducción | La app reproduce el saludo y cada respuesta **automáticamente**; 🔊 vuelve a reproducirla. Si el dispositivo bloquea el audio, usa su propia voz. |
 
-| Tema | Pregunta | Por qué importa en el frontend |
-|---|---|---|
-| Formato | ¿MP3, WAV, OGG/Opus? ¿Tamaño o duración máxima? | Debe reproducirse en Chrome y en el WebView de Android (iOS no reproduce OGG). |
-| Protocolo | ¿Siempre `https`? | La app Android se sirve como `https://localhost`: un audio `http` se bloquea por contenido mixto. |
-| Tipo de URL | ¿Absoluta (almacenamiento externo) o relativa a la API? ¿Pública o firmada y temporal? ¿Cuánto tiempo es válida? | El elemento `<audio>` **no puede enviar** `Authorization: Bearer`; si el audio exige el token, no se podrá reproducir. Una URL vencida cae a la voz del dispositivo. |
-| Contenido | ¿El audio lee `texto` + `frase` juntos, como hoy la voz del dispositivo? | Para que ambas opciones digan lo mismo. |
-| Saludo | ¿`saludo` de `POST /api/sesiones` también tendrá `audioUrl`? | El frontend ya lo soportaría sin cambios. |
+`voz.js` acepta `http`, `https` y `data:audio/...;base64`. Validado con audio real del servidor (ver `backend/scripts/probar-conversacion.js`).
 
-**Pendiente de validación:** la reproducción con un audio real del servidor no se ha probado; solo hay pruebas con un audio simulado y una prueba en Chrome de la caída a la voz del dispositivo (audio inexistente, 404). Se validará cuando backend e IA tengan la integración disponible, en navegador y en un celular Android.
+**Tiempos medidos** (PC de desarrollo, 8 GB, sin GPU): crear sesión ≈ 3 s; turno repitiendo la frase ≈ 5-8 s; turno de conversación libre ≈ 15 s. Por eso `tiempoMaximoRespuestaMs` es 90 000 en `js/config.js`.
 
-Errores que el frontend ya traduce: `TOKEN_INVALIDO`, `SESION_REQUERIDA`, `AUDIO_VACIO`, `AUDIO_DEMASIADO_GRANDE`, `TURNO_NO_INICIADO`, `ERROR_PROCESAMIENTO`.
+Errores que el frontend traduce: `TOKEN_INVALIDO`, `SESION_REQUERIDA`, `SESION_NO_ENCONTRADA`, `AUDIO_VACIO`, `AUDIO_DEMASIADO_GRANDE`, `AUDIO_NO_ENTENDIDO` (silencio o voz no reconocible), `AUDIO_INVALIDO`, `TURNO_NO_INICIADO`, `TUTOR_NO_DISPONIBLE`, `ERROR_PROCESAMIENTO`.
 
 ## Progreso del estudiante (nuevo)
 
