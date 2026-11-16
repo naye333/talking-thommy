@@ -1,4 +1,3 @@
-# Mover este archivo a .github/workflows/ en la RAÍZ del repositorio.
 name: Backend CI
 
 on:

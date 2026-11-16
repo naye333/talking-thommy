@@ -1,9 +1,6 @@
 # Contrato API · Perfil estudiante
 
-> **Para el equipo de backend e IA.** El frontend ya está construido sobre este contrato y hoy usa respuestas simuladas. Al implementarlo, basta con cambiar en `frontend/js/config.js`:
-> - `modoConversacion: 'tiempoReal'` → conversación real.
-> - `usarDatosEjemploProgreso: false` → progreso real.
-> - `usarDatosEjemploDocente: false` → perfil docente real (ver `propuesta-api-perfil-docente.md`).
+> **Estado: implementado** en el backend (ver `backend/README.md`) y activado en `frontend/js/config.js` (`modoConversacion: 'tiempoReal'`, `usarDatosEjemploProgreso: false`, `usarDatosEjemploDocente: false`). Para volver a los datos simulados, usa `'ejemplo'` y `true`.
 
 ## Ya existente (el frontend lo usa tal cual)
 

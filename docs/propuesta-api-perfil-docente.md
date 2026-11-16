@@ -1,6 +1,6 @@
 # Propuesta de API · Perfil docente
 
-> **Estado: propuesta pendiente de aprobación.** Nada de esto existe aún en el backend. El frontend usa datos de ejemplo con esta misma forma (`frontend/js/servicios/docente/servicioDocente.js`). Cuando se implemente, solo cambia ese archivo.
+> **Estado: implementado** en el backend (`backend/src/rutas/docente.js`) y conectado en el frontend (`frontend/js/servicios/docente/servicioDocenteApi.js`). Los estudiantes se asignan al docente con `npm run asignar-docente` (columna `usuarios.docente_id`).
 
 Todas las rutas exigen `Authorization: Bearer <token>` y el rol `docente` (`exigirToken, exigirRol('docente')`). Los errores siguen el formato actual `{ error, detalles? }`.
 

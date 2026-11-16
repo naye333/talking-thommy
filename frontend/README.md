@@ -37,19 +37,21 @@ En Android Studio, pulsa **Run** con un emulador o con un celular conectado por 
 
 ## Estado de la integración con el backend
 
+Todo usa la API real del backend (`js/config.js`):
+
 | Función | Fuente |
 |---|---|
-| Iniciar sesión, consultar la cuenta | API real: `POST /api/auth/ingreso`, `GET /api/auth/yo` |
-| Estudiantes del docente, reportes, falencias, evolución, recomendaciones | **Datos de ejemplo** (`usarDatosEjemploDocente: true`) hasta que existan los endpoints. Propuesta en [`docs/propuesta-api-perfil-docente.md`](../docs/propuesta-api-perfil-docente.md) |
-| Enviar reporte a padres | Deshabilitado: no existe el servicio |
-| Registro de estudiantes, lecciones (syllabus) | API real: `POST /api/auth/registro`, `GET /api/syllabus`, `GET /api/syllabus/temas/:id` |
-| Conversación con Thommy | Micrófono real; tutor **simulado** (`modoConversacion: 'ejemplo'`). Con `'tiempoReal'` usa REST + WebSocket según [`docs/contrato-api-perfil-estudiante.md`](../docs/contrato-api-perfil-estudiante.md) |
-| Audio del tutor (`respuesta.audioUrl`) | Se reproduce si llega; si no, voz del dispositivo. **Pendiente:** acordar formato, protocolo y tipo de URL, y validar con un audio real. Ver la sección "Audio del tutor" en [`docs/contrato-api-perfil-estudiante.md`](../docs/contrato-api-perfil-estudiante.md) |
-| Progreso del estudiante | **Datos de ejemplo** (`usarDatosEjemploProgreso: true`) hasta que exista `GET /api/estudiante/progreso` |
+| Registro, ingreso y cuenta | `POST /api/auth/registro`, `POST /api/auth/ingreso`, `GET /api/auth/yo` |
+| Lecciones (syllabus) | `GET /api/syllabus`, `GET /api/syllabus/temas/:id` |
+| Conversación con Thommy | `POST /api/sesiones` + WebSocket `/tiempo-real` (`modoConversacion: 'tiempoReal'`) |
+| Progreso del estudiante | `GET /api/estudiante/progreso` (`usarDatosEjemploProgreso: false`) |
+| Perfil docente: estudiantes, alertas, reportes, falencias, evolución, recomendaciones | `/api/docente/...` (`usarDatosEjemploDocente: false`, ver `js/servicios/docente/servicioDocenteApi.js`) |
+| Enviar reporte a padres | Deshabilitado: pendiente de decisión del equipo |
+| Audio del tutor (`respuesta.audioUrl`) | El backend envía `null`: se usa la voz del dispositivo. Pendiente acordar el formato del audio |
+
+Para probar la interfaz sin backend, pon `modoConversacion: 'ejemplo'` y los dos `usarDatosEjemplo…` en `true`.
 
 El micrófono necesita HTTPS o `localhost` en el navegador; en Android, el permiso `RECORD_AUDIO` ya está en el manifiesto.
-
-Cuando el backend tenga esos endpoints, solo cambia la fuente de datos en `js/servicios/docente/`; las pantallas no se modifican.
 
 ## Estructura
 
