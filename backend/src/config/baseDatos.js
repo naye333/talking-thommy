@@ -20,6 +20,18 @@ function obtenerPool () {
   return pool
 }
 
+// Igual que obtenerPool, pero responde 503 si la base de datos no está configurada
+function obtenerPoolObligatorio () {
+  const poolActual = obtenerPool()
+  if (!poolActual) {
+    const error = new Error('Base de datos no configurada')
+    error.estado = 503
+    error.codigo = 'BASE_DATOS_NO_DISPONIBLE'
+    throw error
+  }
+  return poolActual
+}
+
 // Verifica la conexión con una consulta mínima
 async function verificarConexion () {
   const poolActual = obtenerPool()
@@ -39,4 +51,4 @@ async function cerrarPool () {
   }
 }
 
-module.exports = { obtenerPool, verificarConexion, cerrarPool }
+module.exports = { obtenerPool, obtenerPoolObligatorio, verificarConexion, cerrarPool }
