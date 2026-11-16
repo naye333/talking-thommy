@@ -14,9 +14,8 @@ cd backend
 npm install
 cp .env.example .env      # luego pega tu DATABASE_URL de Neon y tu GROQ_API_KEY
 npm run migrar            # crea las tablas en la base de datos
-npm run sembrar-syllabus  # carga el syllabus de Inglés I
-npm run crear-docente -- profe@usta.edu.co "Nombre" "contrasena"
-npm run asignar-docente -- profe@usta.edu.co estudiante@correo.com
+npm run sembrar-syllabus  # carga el syllabus de Inglés I y la propuesta de Inglés II
+npm run crear-docente -- profe@usta.edu.co "Nombre" "contrasena"   # muestra el código de grupo
 npm run dev
 ```
 
@@ -35,8 +34,10 @@ Verifica que todo esté arriba:
 | `npm run lint` | Revisa el estilo con StandardJS |
 | `npm run migrar` | Aplica las migraciones pendientes de `src/bd/migraciones` |
 | `npm run crear-docente -- correo "Nombre" "clave"` | Crea una cuenta de docente |
-| `npm run sembrar-syllabus [-- archivo.json]` | Carga o actualiza el syllabus (por defecto, Inglés I) |
-| `npm run asignar-docente -- correoDocente correoEstudiante...` | Asigna estudiantes a un docente para que aparezcan en su perfil |
+| `npm run sembrar-syllabus [-- archivo.json]` | Carga o actualiza el syllabus (por defecto, todos los `semillas/syllabus-*.json`) |
+| `npm run asignar-docente -- correoDocente correoEstudiante...` | Asigna estudiantes a un docente (alternativa al código de grupo) |
+| `npm run restablecer-contrasena -- correo "NuevaContrasena"` | Cambia la contraseña de cualquier cuenta (por ejemplo, si el docente olvidó la suya) |
+| `npm run medir-calidad -- carpeta [--con-tutor]` | Mide la precisión de la transcripción y la latencia con audios reales (ver `docs/metricas-calidad.md`) |
 
 ## Autenticación
 
@@ -44,11 +45,32 @@ El registro público crea solo **estudiantes**. Las cuentas de docente se crean 
 
 | Método | Ruta | Cuerpo | Respuesta |
 |---|---|---|---|
-| POST | `/api/auth/registro` | `{ nombre, correo, contrasena, nivel }` (nivel 1 o 2) | `201 { token, usuario }` |
+| POST | `/api/auth/registro` | `{ nombre, correo, contrasena, nivel, codigoGrupo? }` (nivel 1 o 2) | `201 { token, usuario }` |
 | POST | `/api/auth/ingreso` | `{ correo, contrasena }` | `200 { token, usuario }` |
 | GET | `/api/auth/yo` | — (encabezado `Authorization: Bearer <token>`) | `200 { usuario }` |
+| PATCH | `/api/auth/contrasena` | `{ contrasenaActual, contrasenaNueva }` | `204` |
 
-Códigos de error: `DATOS_INVALIDOS` (400, con `detalles` por campo), `JSON_INVALIDO` (400), `CREDENCIALES_INVALIDAS` (401), `TOKEN_REQUERIDO` (401), `TOKEN_INVALIDO` (401), `PERMISO_DENEGADO` (403), `USUARIO_NO_ENCONTRADO` (404), `CORREO_EN_USO` (409), `BASE_DATOS_NO_DISPONIBLE` (503).
+Códigos de error: `DATOS_INVALIDOS` (400, con `detalles` por campo), `JSON_INVALIDO` (400), `CONTRASENA_INCORRECTA` (400), `CODIGO_GRUPO_INVALIDO` (400), `CREDENCIALES_INVALIDAS` (401), `TOKEN_REQUERIDO` (401), `TOKEN_INVALIDO` (401), `PERMISO_DENEGADO` (403), `USUARIO_NO_ENCONTRADO` (404), `CORREO_EN_USO` (409), `DEMASIADOS_INTENTOS` (429), `BASE_DATOS_NO_DISPONIBLE` (503).
+
+**Límite de intentos:** registro, ingreso y cambio de contraseña aceptan 10 intentos **fallidos** por IP cada 15 minutos (`MAX_INTENTOS_AUTH`). Los intentos exitosos no cuentan.
+
+### Grupo docente-estudiantes
+
+Cada docente tiene un **código de grupo** de 6 caracteres, sin letras que se confundan (0/O, 1/I/L). El estudiante lo escribe al registrarse (`codigoGrupo`) o después:
+
+| Método | Ruta | Rol | Respuesta |
+|---|---|---|---|
+| GET | `/api/estudiante/grupo` | estudiante | `{ docente: { id, nombre } \| null }` |
+| POST | `/api/estudiante/grupo` | estudiante | Cuerpo `{ codigo }` → `{ docente }` |
+| GET | `/api/docente/grupo` | docente | `{ codigo }` |
+| POST | `/api/docente/grupo/codigo` | docente | `{ codigo }` nuevo (los estudiantes ya unidos se mantienen) |
+
+### Contraseña olvidada
+
+- **Estudiante:** su docente genera una contraseña temporal con `POST /api/docente/estudiantes/:id/contrasena-temporal` → `{ estudiante, contrasenaTemporal }`. Luego el estudiante la cambia en su perfil.
+- **Docente:** `npm run restablecer-contrasena -- correo "NuevaContrasena"`.
+
+No hay recuperación por correo porque el proyecto no tiene un servicio de envío de correos.
 
 Las contraseñas se guardan cifradas con bcrypt y nunca se devuelven al cliente. Para proteger una ruta:
 
@@ -58,9 +80,12 @@ router.get('/curso', exigirToken, exigirRol('docente'), controlador)
 
 ## Syllabus
 
-El contenido vive en `src/bd/semillas/syllabus-ingles-1.json`, tomado de la planeación oficial de Inglés I (A1, 2026-2): 3 cortes y 10 temas. Según el Acta, no se edita desde la app: para cambiarlo se modifica el JSON y se vuelve a ejecutar `npm run sembrar-syllabus` (actualiza sin duplicar). Para Inglés II, crea `syllabus-ingles-2.json` con la misma estructura y `"nivel": 2`.
+El contenido vive en `src/bd/semillas/`. Según el Acta, no se edita desde la app: para cambiarlo se modifica el JSON y se vuelve a ejecutar `npm run sembrar-syllabus` (actualiza sin duplicar).
 
-> El vocabulario y las frases modelo de cada tema son una propuesta del equipo, pendiente de validación por el profesor.
+- `syllabus-ingles-1.json`: tomado de la planeación oficial de Inglés I (A1, 2026-2), con 3 cortes y 10 temas. El vocabulario y las frases modelo son una propuesta del equipo.
+- `syllabus-ingles-2.json`: **propuesta completa del equipo** para Inglés II (A2), con 3 cortes y 9 temas, para que los estudiantes de nivel 2 puedan practicar. Hay que reemplazarla con la planeación oficial cuando el profesor la entregue: basta con editar el JSON y volver a sembrar.
+
+> Todo el contenido marcado como propuesta está pendiente de validación por el profesor.
 
 | Método | Ruta | Respuesta |
 |---|---|---|
@@ -145,10 +170,11 @@ Códigos de error: `TOKEN_INVALIDO`, `SESION_REQUERIDA`, `SESION_NO_ENCONTRADA`,
 
 ## Perfil docente
 
-Todas exigen rol `docente`. El docente solo ve a los estudiantes que tiene asignados (`npm run asignar-docente`). `periodo` funciona igual que en el progreso del estudiante.
+Todas exigen rol `docente`. El docente solo ve a los estudiantes de su grupo (código de grupo o `npm run asignar-docente`). `periodo` funciona igual que en el progreso del estudiante.
 
 | Método | Ruta | Respuesta |
 |---|---|---|
+| POST | `/api/docente/estudiantes/:id/contrasena-temporal` | `{ estudiante, contrasenaTemporal }` (ver "Contraseña olvidada") |
 | GET | `/api/docente/estudiantes?busqueda=` | `{ estudiantes: [{ id, nombre, nivel, promedioGeneral, variacion }] }` (último mes; la búsqueda ignora tildes) |
 | GET | `/api/docente/alertas` | `{ alertas: [{ id, nombre, nivel, promedioGeneral, motivo }] }`: promedio < 65 % o variación negativa (solo estudiantes con práctica) |
 | GET | `/api/docente/estudiantes/:id/reporte?periodo=` | `{ estudiante, periodo, promedioGeneral, variacion, totalTurnos, areas }` |

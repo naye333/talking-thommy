@@ -41,7 +41,9 @@ Todo usa la API real del backend (`js/config.js`):
 
 | Función | Fuente |
 |---|---|
-| Registro, ingreso y cuenta | `POST /api/auth/registro`, `POST /api/auth/ingreso`, `GET /api/auth/yo` |
+| Registro (con código de grupo opcional), ingreso y cuenta | `POST /api/auth/registro`, `POST /api/auth/ingreso`, `GET /api/auth/yo` |
+| Configuración: grupo y cambio de contraseña | `/api/estudiante/grupo`, `/api/docente/grupo`, `PATCH /api/auth/contrasena` (`js/servicios/servicioCuenta.js`) |
+| Contraseña temporal para un estudiante (docente → Acciones) | `POST /api/docente/estudiantes/:id/contrasena-temporal` |
 | Lecciones (syllabus) | `GET /api/syllabus`, `GET /api/syllabus/temas/:id` |
 | Conversación con Thommy | `POST /api/sesiones` + WebSocket `/tiempo-real` (`modoConversacion: 'tiempoReal'`) |
 | Progreso del estudiante | `GET /api/estudiante/progreso` (`usarDatosEjemploProgreso: false`) |

@@ -40,9 +40,12 @@ El frontend usa el backend real por defecto (`frontend/js/config.js`). Para prob
 
 ```bash
 cd backend
-npm run crear-docente -- correo@usta.edu.co "Nombre" "contrasena"
-npm run asignar-docente -- correo@usta.edu.co estudiante1@correo.com estudiante2@correo.com
+npm run crear-docente -- correo@usta.edu.co "Nombre" "contrasena"     # muestra el código de grupo
+npm run restablecer-contrasena -- correo@usta.edu.co "NuevaContrasena"
+npm run medir-calidad -- carpeta-con-audios                            # docs/metricas-calidad.md
 ```
+
+Los estudiantes se unen al grupo del docente con su código (al registrarse o en su perfil). Más detalles en `docs/manual-de-usuario.md` y `docs/historias-de-usuario.md`.
 
 ## Pruebas
 
