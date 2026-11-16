@@ -1,7 +1,7 @@
 // Acceso a la tabla usuarios. Las funciones devuelven objetos en camelCase.
 const { obtenerPool } = require('../config/baseDatos')
 
-const COLUMNAS = 'id, nombre, correo, hash_contrasena, rol, nivel, creado_en'
+const COLUMNAS = 'id, nombre, correo, hash_contrasena, rol, nivel, docente_id, creado_en'
 
 function mapearUsuario (fila) {
   if (!fila) return null
@@ -12,6 +12,7 @@ function mapearUsuario (fila) {
     hashContrasena: fila.hash_contrasena,
     rol: fila.rol,
     nivel: fila.nivel,
+    docenteId: fila.docente_id ?? null,
     creadoEn: fila.creado_en
   }
 }
@@ -41,12 +42,12 @@ async function buscarPorId (id) {
   return mapearUsuario(rows[0])
 }
 
-async function crearUsuario ({ nombre, correo, hashContrasena, rol, nivel }) {
+async function crearUsuario ({ nombre, correo, hashContrasena, rol, nivel, docenteId = null }) {
   try {
     const { rows } = await obtenerPoolObligatorio().query(
-      `INSERT INTO usuarios (nombre, correo, hash_contrasena, rol, nivel)
-       VALUES ($1, $2, $3, $4, $5) RETURNING ${COLUMNAS}`,
-      [nombre, correo, hashContrasena, rol, nivel]
+      `INSERT INTO usuarios (nombre, correo, hash_contrasena, rol, nivel, docente_id)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING ${COLUMNAS}`,
+      [nombre, correo, hashContrasena, rol, nivel, docenteId]
     )
     return mapearUsuario(rows[0])
   } catch (error) {
@@ -96,11 +97,65 @@ async function asignarDocente (docenteId, correosEstudiantes) {
   return rowCount
 }
 
+async function actualizarContrasena (id, hashContrasena) {
+  await obtenerPoolObligatorio().query(
+    'UPDATE usuarios SET hash_contrasena = $2, actualizado_en = NOW() WHERE id = $1',
+    [id, hashContrasena]
+  )
+}
+
+async function asignarDocentePorId (estudianteId, docenteId) {
+  await obtenerPoolObligatorio().query(
+    `UPDATE usuarios SET docente_id = $2, actualizado_en = NOW()
+      WHERE id = $1 AND rol = 'estudiante'`,
+    [estudianteId, docenteId]
+  )
+}
+
+async function buscarDocentePorCodigo (codigo) {
+  const { rows } = await obtenerPoolObligatorio().query(
+    "SELECT id, nombre FROM usuarios WHERE rol = 'docente' AND codigo_grupo = $1",
+    [codigo]
+  )
+  return rows[0] || null
+}
+
+async function obtenerCodigoGrupo (docenteId) {
+  const { rows } = await obtenerPoolObligatorio().query(
+    "SELECT codigo_grupo FROM usuarios WHERE id = $1 AND rol = 'docente'",
+    [docenteId]
+  )
+  return rows[0]?.codigo_grupo || null
+}
+
+// Devuelve el código guardado; lanza CODIGO_EN_USO si otro docente ya lo tiene
+async function actualizarCodigoGrupo (docenteId, codigo) {
+  try {
+    await obtenerPoolObligatorio().query(
+      "UPDATE usuarios SET codigo_grupo = $2, actualizado_en = NOW() WHERE id = $1 AND rol = 'docente'",
+      [docenteId, codigo]
+    )
+    return codigo
+  } catch (error) {
+    if (error.code === '23505') {
+      const errorCodigo = new Error('Código en uso')
+      errorCodigo.codigo = 'CODIGO_EN_USO'
+      throw errorCodigo
+    }
+    throw error
+  }
+}
+
 module.exports = {
   buscarPorCorreo,
   buscarPorId,
   crearUsuario,
   listarEstudiantesDeDocente,
   buscarEstudianteDeDocente,
-  asignarDocente
+  asignarDocente,
+  actualizarContrasena,
+  asignarDocentePorId,
+  buscarDocentePorCodigo,
+  obtenerCodigoGrupo,
+  actualizarCodigoGrupo
 }

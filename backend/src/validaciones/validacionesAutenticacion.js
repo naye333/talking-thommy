@@ -31,10 +31,36 @@ function validarRegistro (cuerpo = {}) {
   const nivel = Number(cuerpo.nivel)
   if (![1, 2].includes(nivel)) errores.push({ campo: 'nivel', mensaje: 'El nivel debe ser 1 o 2' })
 
+  // Opcional: código de grupo del docente para quedar asignado desde el registro
+  let codigoGrupo = null
+  if (cuerpo.codigoGrupo !== undefined && cuerpo.codigoGrupo !== null && cuerpo.codigoGrupo !== '') {
+    if (typeof cuerpo.codigoGrupo !== 'string' || cuerpo.codigoGrupo.trim().length > 20) {
+      errores.push({ campo: 'codigoGrupo', mensaje: 'Código de grupo no válido' })
+    } else {
+      codigoGrupo = cuerpo.codigoGrupo
+    }
+  }
+
   return {
     errores,
-    datos: { nombre: esTextoConContenido(cuerpo.nombre) ? cuerpo.nombre.trim() : '', correo, contrasena, nivel }
+    datos: { nombre: esTextoConContenido(cuerpo.nombre) ? cuerpo.nombre.trim() : '', correo, contrasena, nivel, codigoGrupo }
   }
+}
+
+function validarCambioContrasena (cuerpo = {}) {
+  const errores = []
+  if (!esTextoConContenido(cuerpo.contrasenaActual)) {
+    errores.push({ campo: 'contrasenaActual', mensaje: 'Escribe tu contraseña actual' })
+  }
+  const nueva = cuerpo.contrasenaNueva
+  if (typeof nueva !== 'string' || nueva.length < MIN_CONTRASENA) {
+    errores.push({ campo: 'contrasenaNueva', mensaje: `Mínimo ${MIN_CONTRASENA} caracteres` })
+  } else if (nueva.length > MAX_CONTRASENA) {
+    errores.push({ campo: 'contrasenaNueva', mensaje: `Máximo ${MAX_CONTRASENA} caracteres` })
+  } else if (nueva === cuerpo.contrasenaActual) {
+    errores.push({ campo: 'contrasenaNueva', mensaje: 'Debe ser diferente de la actual' })
+  }
+  return { errores, datos: { contrasenaActual: cuerpo.contrasenaActual, contrasenaNueva: nueva } }
 }
 
 function validarIngreso (cuerpo = {}) {
@@ -45,4 +71,4 @@ function validarIngreso (cuerpo = {}) {
   return { errores, datos: { correo, contrasena: cuerpo.contrasena } }
 }
 
-module.exports = { validarRegistro, validarIngreso }
+module.exports = { validarRegistro, validarIngreso, validarCambioContrasena }

@@ -22,6 +22,8 @@ const entorno = {
   maxBytesAudioTurno: Number(process.env.MAX_BYTES_AUDIO_TURNO) || 25 * 1024 * 1024,
   jwtSecreto,
   jwtExpiracion: process.env.JWT_EXPIRACION || '7d',
+  // Intentos fallidos de ingreso, registro o cambio de contraseña permitidos por IP cada 15 minutos
+  maxIntentosAuth: Number(process.env.MAX_INTENTOS_AUTH) || 10,
 
   // Inteligencia artificial (Groq): transcripción con Whisper y tutor con un modelo de lenguaje
   groqApiKey: process.env.GROQ_API_KEY || '',

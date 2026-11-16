@@ -3,6 +3,8 @@ const repositorioUsuarios = require('../repositorios/repositorioUsuarios')
 const repositorioPractica = require('../repositorios/repositorioPractica')
 const repositorioRecomendaciones = require('../repositorios/repositorioRecomendaciones')
 const reportes = require('../servicios/servicioReportes')
+const servicioGrupos = require('../servicios/servicioGrupos')
+const { restablecerContrasena } = require('../servicios/servicioAutenticacion')
 const { crearError } = require('../utilidades/errores')
 
 const MAX_LONGITUD_RECOMENDACION = 140
@@ -184,7 +186,38 @@ async function eliminarRecomendacion (request, response, next) {
   }
 }
 
+// GET /api/docente/grupo → código que los estudiantes escriben para unirse a su grupo
+async function consultarGrupo (request, response, next) {
+  try {
+    response.json({ codigo: await servicioGrupos.obtenerCodigo(request.usuario.id) })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// POST /api/docente/grupo/codigo → reemplaza el código (los estudiantes ya unidos se mantienen)
+async function regenerarCodigoGrupo (request, response, next) {
+  try {
+    response.json({ codigo: await servicioGrupos.asignarCodigoNuevo(request.usuario.id) })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// POST /api/docente/estudiantes/:id/contrasena-temporal → para el estudiante que olvidó su contraseña
+async function restablecerContrasenaEstudiante (request, response, next) {
+  try {
+    const estudiante = await obtenerEstudiante(request)
+    response.json({ estudiante, contrasenaTemporal: await restablecerContrasena(estudiante.id) })
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
+  consultarGrupo,
+  regenerarCodigoGrupo,
+  restablecerContrasenaEstudiante,
   listarEstudiantes,
   listarAlertas,
   consultarReporte,

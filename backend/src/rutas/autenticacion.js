@@ -1,11 +1,18 @@
 const { Router } = require('express')
 const controlador = require('../controladores/controladorAutenticacion')
 const { exigirToken } = require('../middlewares/autenticacion')
+const { crearLimiteIntentos } = require('../middlewares/limiteIntentos')
 
-const rutasAutenticacion = Router()
+// Se crea por app para que cada instancia (y cada archivo de pruebas) lleve su propio conteo
+function crearRutasAutenticacion () {
+  const rutas = Router()
+  const limiteIntentos = crearLimiteIntentos()
 
-rutasAutenticacion.post('/registro', controlador.registrar)
-rutasAutenticacion.post('/ingreso', controlador.ingresar)
-rutasAutenticacion.get('/yo', exigirToken, controlador.consultarUsuarioActual)
+  rutas.post('/registro', limiteIntentos, controlador.registrar)
+  rutas.post('/ingreso', limiteIntentos, controlador.ingresar)
+  rutas.get('/yo', exigirToken, controlador.consultarUsuarioActual)
+  rutas.patch('/contrasena', exigirToken, limiteIntentos, controlador.cambiarContrasena)
+  return rutas
+}
 
-module.exports = rutasAutenticacion
+module.exports = { crearRutasAutenticacion }

@@ -88,3 +88,20 @@ describe('repositorioUsuarios (docente)', () => {
     expect(mockConsultas.at(-1).parametros).toEqual([9, ['a@b.co', 'c@d.co']])
   })
 })
+
+describe('repositorioUsuarios (cuentas y grupos)', () => {
+  test('actualiza contraseña, asigna docente y maneja el código de grupo', async () => {
+    await repositorioUsuarios.actualizarContrasena(2, 'hash')
+    await repositorioUsuarios.asignarDocentePorId(2, 9)
+    expect(mockConsultas.at(-1).parametros).toEqual([2, 9])
+
+    mockRespuesta = { rows: [{ id: 9, nombre: 'Profe' }] }
+    expect(await repositorioUsuarios.buscarDocentePorCodigo('ABC234')).toEqual({ id: 9, nombre: 'Profe' })
+    mockRespuesta = { rows: [{ codigo_grupo: 'ABC234' }] }
+    expect(await repositorioUsuarios.obtenerCodigoGrupo(9)).toBe('ABC234')
+    mockRespuesta = { rows: [] }
+    expect(await repositorioUsuarios.obtenerCodigoGrupo(9)).toBeNull()
+    expect(await repositorioUsuarios.buscarDocentePorCodigo('NADA')).toBeNull()
+    expect(await repositorioUsuarios.actualizarCodigoGrupo(9, 'XYZ789')).toBe('XYZ789')
+  })
+})

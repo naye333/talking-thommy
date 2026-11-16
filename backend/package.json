@@ -11,7 +11,9 @@
     "migrar": "node src/bd/migrar.js",
     "crear-docente": "node src/bd/crearDocente.js",
     "sembrar-syllabus": "node src/bd/sembrarSyllabus.js",
-    "asignar-docente": "node src/bd/asignarDocente.js"
+    "asignar-docente": "node src/bd/asignarDocente.js",
+    "restablecer-contrasena": "node src/bd/restablecerContrasena.js",
+    "medir-calidad": "node src/herramientas/medirCalidad.js"
   },
   "engines": {
     "node": ">=20"
@@ -22,6 +24,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
+    "express-rate-limit": "^7.5.1",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.13.0",

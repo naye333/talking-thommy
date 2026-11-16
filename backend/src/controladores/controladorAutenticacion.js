@@ -1,5 +1,5 @@
 const servicioAutenticacion = require('../servicios/servicioAutenticacion')
-const { validarRegistro, validarIngreso } = require('../validaciones/validacionesAutenticacion')
+const { validarRegistro, validarIngreso, validarCambioContrasena } = require('../validaciones/validacionesAutenticacion')
 const { crearError } = require('../utilidades/errores')
 
 async function registrar (request, response, next) {
@@ -33,4 +33,15 @@ async function consultarUsuarioActual (request, response, next) {
   }
 }
 
-module.exports = { registrar, ingresar, consultarUsuarioActual }
+async function cambiarContrasena (request, response, next) {
+  try {
+    const { errores, datos } = validarCambioContrasena(request.body)
+    if (errores.length > 0) throw crearError(400, 'DATOS_INVALIDOS', errores)
+    await servicioAutenticacion.cambiarContrasena(request.usuario.id, datos)
+    response.status(204).end()
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { registrar, ingresar, consultarUsuarioActual, cambiarContrasena }

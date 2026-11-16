@@ -3,6 +3,7 @@
 const { cerrarPool } = require('../config/baseDatos')
 const repositorioUsuarios = require('../repositorios/repositorioUsuarios')
 const { cifrarContrasena } = require('../servicios/servicioAutenticacion')
+const { asignarCodigoNuevo } = require('../servicios/servicioGrupos')
 
 async function crearDocente ([correo, nombre, contrasena]) {
   if (!correo || !nombre || !contrasena) {
@@ -17,7 +18,9 @@ async function crearDocente ([correo, nombre, contrasena]) {
     rol: 'docente',
     nivel: null
   })
+  const codigo = await asignarCodigoNuevo(usuario.id)
   console.log(`[docente] creado con id ${usuario.id}: ${usuario.correo}`)
+  console.log(`[docente] código de grupo para los estudiantes: ${codigo}`)
 }
 
 crearDocente(process.argv.slice(2))
