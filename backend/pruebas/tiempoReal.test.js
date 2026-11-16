@@ -2,18 +2,35 @@ const WebSocket = require('ws')
 const { iniciarServidor, detenerServidor } = require('../src/servidor')
 const { generarToken } = require('../src/servicios/servicioAutenticacion')
 
+const { crearError } = require('../src/utilidades/errores')
+
 const token = generarToken({ id: 1, rol: 'estudiante', nivel: 1 })
 
 let servidores
 let urlBase
 
+// Sesiones simuladas: "abc" y "xyz" son del estudiante 1; cualquier otra no existe
+async function cargarContexto (usuario, sesionId) {
+  if (!['abc', 'xyz', 'lento', 'falla'].includes(sesionId)) throw crearError(404, 'SESION_NO_ENCONTRADA')
+  return { sesion: { id: sesionId }, usuarioId: usuario.id, fraseActual: 'Nice to meet you.' }
+}
+
+// Procesador simulado: no llama a la IA
+async function procesarTurno (audio, contexto) {
+  if (contexto.sesion.id === 'falla') throw new Error('fallo inesperado')
+  if (contexto.sesion.id === 'lento') await new Promise((resolve) => setTimeout(resolve, 150))
+  return { tipo: 'resultado_turno', bytes: audio.length, frase: contexto.fraseActual }
+}
+
 beforeAll(async () => {
-  servidores = await iniciarServidor(0) // puerto libre aleatorio
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  servidores = await iniciarServidor(0, { cargarContexto, procesarTurno }) // puerto libre aleatorio
   urlBase = `ws://localhost:${servidores.servidorHttp.address().port}/tiempo-real`
 })
 
 afterAll(async () => {
   await detenerServidor(servidores)
+  jest.restoreAllMocks()
 })
 
 // Abre un socket y entrega una función para esperar el siguiente mensaje JSON
@@ -69,8 +86,46 @@ describe('WebSocket /tiempo-real', () => {
     socket.send(JSON.stringify({ tipo: 'fin_turno' }))
 
     expect((await recibir()).tipo).toBe('procesando')
-    expect(await recibir()).toEqual({ tipo: 'turno_recibido', bytes: 1500, sesionId: 'abc' })
+    expect(await recibir()).toEqual({ tipo: 'resultado_turno', bytes: 1500, frase: 'Nice to meet you.' })
 
+    socket.close()
+  })
+
+  test('rechaza sesiones inexistentes o ajenas', async () => {
+    const { socket, recibir } = conectar(`?sesion=999&token=${token}`)
+    expect((await recibir()).codigo).toBe('SESION_NO_ENCONTRADA')
+    await new Promise((resolve) => socket.on('close', resolve))
+  })
+
+  test('no procesa dos turnos a la vez', async () => {
+    const { socket, recibir } = conectar(`?sesion=lento&token=${token}`)
+    await recibir() // conectado
+
+    const enviarTurno = () => {
+      socket.send(JSON.stringify({ tipo: 'inicio_turno' }))
+      socket.send(Buffer.alloc(10))
+      socket.send(JSON.stringify({ tipo: 'fin_turno' }))
+    }
+    enviarTurno()
+    expect((await recibir()).tipo).toBe('turno_iniciado')
+    expect((await recibir()).tipo).toBe('procesando')
+    enviarTurno()
+    expect((await recibir()).tipo).toBe('turno_iniciado')
+    expect((await recibir()).codigo).toBe('TURNO_EN_PROCESO')
+    expect((await recibir()).tipo).toBe('resultado_turno')
+
+    socket.close()
+  })
+
+  test('responde ERROR_PROCESAMIENTO si el turno falla', async () => {
+    const { socket, recibir } = conectar(`?sesion=falla&token=${token}`)
+    await recibir() // conectado
+    socket.send(JSON.stringify({ tipo: 'inicio_turno' }))
+    socket.send(Buffer.alloc(10))
+    socket.send(JSON.stringify({ tipo: 'fin_turno' }))
+    await recibir() // turno_iniciado
+    await recibir() // procesando
+    expect((await recibir()).codigo).toBe('ERROR_PROCESAMIENTO')
     socket.close()
   })
 

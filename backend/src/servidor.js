@@ -5,9 +5,10 @@ const { crearServidorWebSocket } = require('./tiempo-real/manejadorWebSocket')
 const { cerrarPool } = require('./config/baseDatos')
 
 // REST y WebSocket comparten el mismo puerto (necesario en Render)
-function iniciarServidor (puerto = entorno.puerto) {
+// opciones se pasa al WebSocket (permite reemplazar la IA y la BD en pruebas)
+function iniciarServidor (puerto = entorno.puerto, opciones = {}) {
   const servidorHttp = http.createServer(crearApp())
-  const servidorWs = crearServidorWebSocket(servidorHttp)
+  const servidorWs = crearServidorWebSocket(servidorHttp, opciones)
 
   return new Promise((resolve) => {
     servidorHttp.listen(puerto, () => {
