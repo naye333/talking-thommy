@@ -1,0 +1,89 @@
+// Cliente mínimo de la API de Groq (compatible con OpenAI) usando fetch nativo de Node 20.
+//  - transcribirAudio: voz → texto con Whisper
+//  - completarJson: respuesta del tutor en formato JSON
+const entorno = require('../../config/entorno')
+const { crearError } = require('../../utilidades/errores')
+
+// Whisper deduce el formato por la extensión del archivo, así que la detectamos por los primeros bytes
+function detectarFormatoAudio (audio) {
+  if (audio.length >= 4 && audio.readUInt32BE(0) === 0x1a45dfa3) return { extension: 'webm', tipo: 'audio/webm' }
+  if (audio.length >= 12 && audio.toString('ascii', 4, 8) === 'ftyp') return { extension: 'm4a', tipo: 'audio/mp4' }
+  if (audio.toString('ascii', 0, 4) === 'OggS') return { extension: 'ogg', tipo: 'audio/ogg' }
+  if (audio.toString('ascii', 0, 4) === 'RIFF') return { extension: 'wav', tipo: 'audio/wav' }
+  if (audio.toString('ascii', 0, 3) === 'ID3' || (audio[0] === 0xff && (audio[1] & 0xe0) === 0xe0)) {
+    return { extension: 'mp3', tipo: 'audio/mpeg' }
+  }
+  return null
+}
+
+function exigirClave () {
+  if (!entorno.groqApiKey) throw crearError(503, 'TUTOR_NO_DISPONIBLE')
+}
+
+async function llamarGroq (ruta, opciones) {
+  let respuesta
+  try {
+    respuesta = await fetch(`${entorno.groqUrlBase}${ruta}`, {
+      ...opciones,
+      headers: { Authorization: `Bearer ${entorno.groqApiKey}`, ...opciones.headers },
+      signal: AbortSignal.timeout(entorno.tiempoMaximoIaMs)
+    })
+  } catch (error) {
+    const codigo = error.name === 'TimeoutError' ? 'IA_TIEMPO_AGOTADO' : 'IA_NO_DISPONIBLE'
+    throw crearError(502, codigo)
+  }
+  if (!respuesta.ok) {
+    const detalle = await respuesta.text().catch(() => '')
+    console.error(`[ia] Groq respondió ${respuesta.status} en ${ruta}: ${detalle.slice(0, 300)}`)
+    throw crearError(502, respuesta.status === 429 ? 'IA_LIMITE_ALCANZADO' : 'IA_NO_DISPONIBLE')
+  }
+  return respuesta.json()
+}
+
+// Devuelve { texto, duracion (segundos), segmentos: [{ inicio, fin, texto }] }
+async function transcribirAudio (audio) {
+  exigirClave()
+  const formato = detectarFormatoAudio(audio)
+  if (!formato) throw crearError(415, 'FORMATO_AUDIO_NO_SOPORTADO')
+
+  const formulario = new FormData()
+  formulario.append('file', new Blob([audio], { type: formato.tipo }), `turno.${formato.extension}`)
+  formulario.append('model', entorno.modeloTranscripcion)
+  formulario.append('language', 'en')
+  formulario.append('response_format', 'verbose_json')
+  formulario.append('temperature', '0')
+
+  const datos = await llamarGroq('/audio/transcriptions', { method: 'POST', body: formulario })
+  return {
+    texto: (datos.text || '').trim(),
+    duracion: Number(datos.duration) || 0,
+    segmentos: (datos.segments || []).map((segmento) => ({
+      inicio: segmento.start,
+      fin: segmento.end,
+      texto: segmento.text
+    }))
+  }
+}
+
+// Envía la conversación y devuelve el objeto JSON que produce el modelo
+async function completarJson (mensajes, { temperatura = 0.4 } = {}) {
+  exigirClave()
+  const datos = await llamarGroq('/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: entorno.modeloTutor,
+      messages: mensajes,
+      temperature: temperatura,
+      max_tokens: 700,
+      response_format: { type: 'json_object' }
+    })
+  })
+  try {
+    return JSON.parse(datos.choices[0].message.content)
+  } catch {
+    throw crearError(502, 'IA_RESPUESTA_INVALIDA')
+  }
+}
+
+module.exports = { detectarFormatoAudio, transcribirAudio, completarJson }

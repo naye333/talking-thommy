@@ -21,7 +21,15 @@ const entorno = {
     .filter(Boolean),
   maxBytesAudioTurno: Number(process.env.MAX_BYTES_AUDIO_TURNO) || 25 * 1024 * 1024,
   jwtSecreto,
-  jwtExpiracion: process.env.JWT_EXPIRACION || '7d'
+  jwtExpiracion: process.env.JWT_EXPIRACION || '7d',
+
+  // Inteligencia artificial (Groq): transcripción con Whisper y tutor con un modelo de lenguaje
+  groqApiKey: process.env.GROQ_API_KEY || '',
+  groqUrlBase: process.env.GROQ_URL_BASE || 'https://api.groq.com/openai/v1',
+  modeloTranscripcion: process.env.MODELO_TRANSCRIPCION || 'whisper-large-v3-turbo',
+  modeloTutor: process.env.MODELO_TUTOR || 'llama-3.3-70b-versatile',
+  tiempoMaximoIaMs: Number(process.env.TIEMPO_MAXIMO_IA_MS) || 20000,
+  maxTurnosHistorial: Number(process.env.MAX_TURNOS_HISTORIAL) || 6
 }
 
 module.exports = entorno
