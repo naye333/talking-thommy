@@ -1,0 +1,13 @@
+{
+  "appId": "co.edu.usta.talkingthommy",
+  "appName": "Talking Thommy",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}
