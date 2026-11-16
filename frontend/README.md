@@ -43,8 +43,8 @@ En Android Studio, pulsa **Run** con un emulador o con un celular conectado por 
 | Estudiantes del docente, reportes, falencias, evolución, recomendaciones | **Datos de ejemplo** (`usarDatosEjemploDocente: true`) hasta que existan los endpoints. Propuesta en [`docs/propuesta-api-perfil-docente.md`](../docs/propuesta-api-perfil-docente.md) |
 | Enviar reporte a padres | Deshabilitado: no existe el servicio |
 | Registro de estudiantes, lecciones (syllabus) | API real: `POST /api/auth/registro`, `GET /api/syllabus`, `GET /api/syllabus/temas/:id` |
-| Conversación con Thommy | Micrófono real; tutor **simulado** (`modoConversacion: 'ejemplo'`). Con `'tiempoReal'` usa REST + WebSocket según [`docs/contrato-api-perfil-estudiante.md`](../docs/contrato-api-perfil-estudiante.md) |
-| Audio del tutor (`respuesta.audioUrl`) | Se reproduce si llega; si no, voz del dispositivo. **Pendiente:** acordar formato, protocolo y tipo de URL, y validar con un audio real. Ver la sección "Audio del tutor" en [`docs/contrato-api-perfil-estudiante.md`](../docs/contrato-api-perfil-estudiante.md) |
+| Conversación con Thommy | **IA real** (`modoConversacion: 'tiempoReal'`): `POST /api/sesiones` + WebSocket. Solo voz: el estudiante habla con el micrófono. Necesita el backend y el servicio [`ia/`](../ia/README.md) encendidos. Con `'ejemplo'` vuelve al tutor simulado, sin backend |
+| Voz de Thommy | Habla **automáticamente** al saludar y al responder (MP3 embebido en el mensaje, voz infantil); 🔊 la repite. Mientras habla, la mascota se anima (`.mascota--hablando`). Si el dispositivo bloquea el audio, usa su propia voz |
 | Progreso del estudiante | **Datos de ejemplo** (`usarDatosEjemploProgreso: true`) hasta que exista `GET /api/estudiante/progreso` |
 
 El micrófono necesita HTTPS o `localhost` en el navegador; en Android, el permiso `RECORD_AUDIO` ya está en el manifiesto.

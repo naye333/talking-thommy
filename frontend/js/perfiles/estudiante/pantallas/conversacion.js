@@ -1,5 +1,6 @@
 // Conversación con Thommy: el estudiante toca el micrófono, habla, y recibe transcripción,
-// retroalimentación de pronunciación y la siguiente intervención del tutor.
+// retroalimentación y la siguiente intervención del tutor, que Thommy dice en voz alta automáticamente.
+// La entrada es solo por voz. Mientras Thommy habla, la mascota se anima (clase mascota--hablando).
 // Estados: listo → escuchando → procesando → resultado → listo
 import { html, renderizar } from '../../../nucleo/dom.js'
 import { obtenerMensajeError } from '../../../nucleo/mensajesError.js'
@@ -18,9 +19,25 @@ function ondaDecorativa (clase) {
   return html`<span class="onda ${clase}" aria-hidden="true">${Array.from({ length: 7 }, (_, indice) => html`<i style="--i: ${indice}"></i>`)}</span>`
 }
 
-// audioUrl (opcional, solo en respuesta): audio del tutor; si falta, el botón usa la voz del dispositivo
+// Lo que Thommy dice en voz alta: su texto y, si hay, la frase a practicar
+export function textoHablado ({ texto, frase }) {
+  return frase ? `${texto} ${frase}` : texto
+}
+
+// true si el micrófono no captó nada de sonido en todo el turno (ni siquiera ruido de fondo).
+// Solo se decide con suficientes mediciones: si la pestaña estuvo oculta, no hay datos y se envía igual.
+export function esGrabacionSilenciosa (volumen, { minimoMediciones = 15, umbral = 0.005 } = {}) {
+  return Boolean(volumen) && volumen.mediciones >= minimoMediciones && volumen.maximo < umbral
+}
+
+// Nombre del puntaje: lo envía el backend ("Palabras entendidas", "Gramática"); si falta, el original
+export function etiquetaPuntaje (evaluacion) {
+  return evaluacion?.etiqueta || 'Pronunciación'
+}
+
+// audioUrl (opcional): audio del tutor; si falta, el botón usa la voz del dispositivo
 function mensajeThommy ({ texto, frase, audioUrl }, urlBase) {
-  const lectura = frase ? `${texto} ${frase}` : texto
+  const lectura = textoHablado({ texto, frase })
   return html`
     <li class="mensaje mensaje--thommy">
       <p class="mensaje__texto" lang="en">${texto}</p>
@@ -50,6 +67,7 @@ function contenidoResultado ({ transcripcion, evaluacion }) {
   const esExcelente = evaluacion.nivel === 'excelente'
   const porMejorar = evaluacion.palabras.filter((palabra) => !palabra.correcta)
   return html`
+    ${mascota({ variante: 'conversacion', clase: 'resultado__mascota' })}
     <div class="resultado__insignia${esExcelente ? '' : ' resultado__insignia--practicar'}">
       ${icono(esExcelente ? 'check' : 'estrella', { clase: 'resultado__icono' })}
       ${icono('chispa', { clase: 'resultado__chispa resultado__chispa--1' })}
@@ -64,7 +82,7 @@ function contenidoResultado ({ transcripcion, evaluacion }) {
         <p class="resultado__detalle-titulo">${esExcelente ? '¡Sigue practicando!' : 'Palabras para practicar'}</p>
         ${palabrasEvaluadas(evaluacion.palabras)}
         ${porMejorar.map((palabra) => palabra.sugerencia ? html`<p class="resultado__sugerencia">${palabra.sugerencia}</p>` : '')}
-        <p class="resultado__puntaje">Pronunciación: <strong>${evaluacion.puntaje}%</strong></p>
+        <p class="resultado__puntaje">${etiquetaPuntaje(evaluacion)}: <strong>${evaluacion.puntaje}%</strong></p>
       </div>
     </section>
     ${botonPrincipal({ texto: 'Continuar', conFlecha: true, accion: 'continuar' })}
@@ -78,6 +96,7 @@ export async function pantallaConversacion ({ contenedor, query }, app) {
   let animacion = null
   let limiteTurno = null
   let resultadoPendiente = null
+  let volumenTurno = null
   let estaActiva = true
 
   renderizar(contenedor, plantillaPantalla({
@@ -101,6 +120,20 @@ export async function pantallaConversacion ({ contenedor, query }, app) {
     callar()
   }
 
+  // Anima todas las mascotas visibles (escena y resultado) mientras Thommy habla
+  function marcarHablando (hablando) {
+    for (const imagen of region.querySelectorAll('.mascota')) imagen.classList.toggle('mascota--hablando', hablando)
+  }
+
+  // Thommy dice su intervención en voz alta, sin que el estudiante tenga que tocar nada
+  function hablarThommy (intervencion) {
+    if (!estaActiva || !intervencion) return
+    escucharThommy(
+      { texto: textoHablado(intervencion), audioUrl: intervencion.audioUrl, urlBase: app.configuracion.urlApi },
+      { alCambiar: marcarHablando }
+    )
+  }
+
   async function iniciar () {
     renderizar(region, estadoCargando('Preparando a Thommy…'))
     try {
@@ -108,6 +141,7 @@ export async function pantallaConversacion ({ contenedor, query }, app) {
       sesion = await servicio.iniciar({ tema })
       if (!estaActiva) return sesion.cerrar()
       mostrarConversacion(tema)
+      hablarThommy(sesion.saludo)
     } catch (error) {
       if (!estaActiva) return
       renderizar(region, estadoError(obtenerMensajeError(error), { conReintento: error.estado !== 404 }))
@@ -146,7 +180,7 @@ export async function pantallaConversacion ({ contenedor, query }, app) {
       </section>
 
       <section class="capa capa--procesando" data-capa="procesando" role="status" hidden>
-        ${estadoCargando('Thommy está analizando tu pronunciación…')}
+        ${estadoCargando('Thommy está escuchando lo que dijiste…')}
       </section>
 
       <section class="capa capa--resultado" data-capa="resultado" role="dialog" aria-modal="true" aria-labelledby="titulo-resultado" hidden>
@@ -167,10 +201,14 @@ export async function pantallaConversacion ({ contenedor, query }, app) {
   function animarOnda () {
     const barras = [...region.querySelectorAll('.onda-viva i')]
     const historial = new Array(barras.length).fill(0.08)
+    volumenTurno = { maximo: 0, mediciones: 0 }
     const pintar = () => {
       if (!grabadora) return
+      const nivel = grabadora.nivel()
+      volumenTurno.maximo = Math.max(volumenTurno.maximo, nivel)
+      volumenTurno.mediciones += 1
       historial.shift()
-      historial.push(Math.max(0.08, grabadora.nivel()))
+      historial.push(Math.max(0.08, nivel))
       barras.forEach((barra, indice) => { barra.style.transform = `scaleY(${historial[indice]})` })
       animacion = requestAnimationFrame(pintar)
     }
@@ -206,12 +244,22 @@ export async function pantallaConversacion ({ contenedor, query }, app) {
     clearTimeout(limiteTurno)
     await grabadora.detener()
     liberarGrabacion()
+    // El micrófono entregó silencio absoluto (silenciado, otro dispositivo o bloqueado por el sistema):
+    // se avisa al instante en vez de esperar al servidor. El siguiente inicio_turno descarta este audio.
+    if (esGrabacionSilenciosa(volumenTurno)) {
+      sesion.cancelarTurno()
+      mostrarCapa(null)
+      aviso(obtenerMensajeError({ codigo: 'MICROFONO_SIN_SONIDO' }))
+      region.querySelector('[data-accion="hablar"]').focus()
+      return
+    }
     mostrarCapa('procesando')
     try {
       resultadoPendiente = await sesion.finalizarTurno()
       if (!estaActiva) return
       renderizar(region.querySelector('[data-region="resultado"]'), contenidoResultado(resultadoPendiente))
       mostrarCapa('resultado')
+      hablarThommy(resultadoPendiente.respuesta)
     } catch (error) {
       if (!estaActiva) return
       mostrarCapa(null)
@@ -244,7 +292,10 @@ export async function pantallaConversacion ({ contenedor, query }, app) {
       'terminar-turno': terminarTurno,
       'cancelar-turno': cancelarTurno,
       continuar,
-      escuchar: () => escucharThommy({ texto: boton.dataset.texto, audioUrl: boton.dataset.audioUrl, urlBase: app.configuracion.urlApi })
+      escuchar: () => escucharThommy(
+        { texto: boton.dataset.texto, audioUrl: boton.dataset.audioUrl, urlBase: app.configuracion.urlApi },
+        { alCambiar: marcarHablando }
+      )
     }
     acciones[boton.dataset.accion]?.()
   }
