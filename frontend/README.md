@@ -37,7 +37,14 @@ En Android Studio, pulsa **Run** con un emulador o con un celular conectado por 
 
 ### Versiones fijas de las dependencias de Android
 
-El proyecto Android usa *dependency locking*: las versiones exactas quedan en los archivos `gradle.lockfile`, así todas las compilaciones usan las mismas. Cuando se agrega o actualiza un plugin de Capacitor, se regeneran desde `frontend/android` con:
+El proyecto Android usa *dependency locking*: las versiones exactas quedan en los archivos `gradle.lockfile`, así todas las compilaciones usan las mismas. Cuando se agrega o actualiza un plugin de Capacitor, se regeneran así. Primero, desde `frontend`, se instalan las dependencias y se sincroniza Capacitor (crea `node_modules/@capacitor/android` y `android/capacitor-cordova-android-plugins`, que Gradle necesita):
+
+```bash
+npm install
+npm run sync
+```
+
+Luego, desde `frontend/android`:
 
 ```bash
 ./gradlew escribirLocks --write-locks
