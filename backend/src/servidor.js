@@ -2,7 +2,8 @@ const http = require('http')
 const entorno = require('./config/entorno')
 const { crearApp } = require('./app')
 const { crearServidorWebSocket } = require('./tiempo-real/manejadorWebSocket')
-const { cerrarPool } = require('./config/baseDatos')
+const { cerrarPool, verificarConexion } = require('./config/baseDatos')
+const { revisarConfiguracion, formatearProblema, explicarErrorBaseDatos } = require('./config/diagnostico')
 
 // REST y WebSocket comparten el mismo puerto (necesario en Render)
 // opciones se pasa al WebSocket (permite reemplazar la IA y la BD en pruebas)
@@ -24,8 +25,23 @@ async function detenerServidor ({ servidorHttp, servidorWs }) {
   await cerrarPool()
 }
 
+// Avisa en la consola lo que falta configurar. En producción, sin base de datos no arranca.
+async function avisarConfiguracion () {
+  const problemas = revisarConfiguracion()
+  for (const problema of problemas) console.warn(`[configuracion] ${formatearProblema(problema)}`)
+  if (entorno.esProduccion && !entorno.urlBaseDatos) {
+    throw new Error('Falta DATABASE_URL en las variables de entorno de producción')
+  }
+  if (!entorno.urlBaseDatos) return
+
+  const { estaConectada, motivo } = await verificarConexion()
+  if (estaConectada) console.log('[bd] conectada a la base de datos')
+  else console.warn(`[bd] ✘ no se pudo conectar: ${explicarErrorBaseDatos(motivo)}`)
+}
+
 // Inicia el servidor y registra el apagado ordenado con Ctrl + C o la señal de Render
 async function arrancar (puerto) {
+  await avisarConfiguracion()
   const servidores = await iniciarServidor(puerto)
   const { port } = servidores.servidorHttp.address()
   console.log(`[servidor] REST en http://localhost:${port}/api`)
@@ -51,4 +67,4 @@ if (require.main === module) {
   })
 }
 
-module.exports = { iniciarServidor, detenerServidor, arrancar }
+module.exports = { iniciarServidor, detenerServidor, arrancar, avisarConfiguracion }

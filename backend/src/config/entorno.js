@@ -1,4 +1,8 @@
-require('dotenv').config()
+const path = require('path')
+
+// Siempre se lee backend/.env, sin importar desde qué carpeta se ejecute el servidor
+const RUTA_ENV = path.join(__dirname, '..', '..', '.env')
+require('dotenv').config({ path: RUTA_ENV, quiet: true })
 
 const nombreEntorno = process.env.ENTORNO || 'desarrollo'
 const esProduccion = nombreEntorno === 'produccion'
@@ -11,6 +15,7 @@ if (!jwtSecreto) {
 
 // Centraliza la lectura de variables de entorno con valores por defecto seguros
 const entorno = {
+  rutaEnv: RUTA_ENV,
   puerto: Number(process.env.PUERTO) || 3000,
   nombreEntorno,
   esProduccion,

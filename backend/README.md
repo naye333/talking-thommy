@@ -28,6 +28,7 @@ Verifica que todo esté arriba:
 
 | Comando | Qué hace |
 |---|---|
+| `npm run verificar` | Revisa `.env`, la conexión a Neon, las tablas, el syllabus, los docentes y la clave de Groq, y dice cómo arreglar lo que falte |
 | `npm run dev` | Arranca con recarga automática |
 | `npm start` | Arranca en modo normal (Render usa este) |
 | `npm test` | Pruebas con cobertura (mínimo 80 % de líneas) |
@@ -38,6 +39,19 @@ Verifica que todo esté arriba:
 | `npm run asignar-docente -- correoDocente correoEstudiante...` | Asigna estudiantes a un docente (alternativa al código de grupo) |
 | `npm run restablecer-contrasena -- correo "NuevaContrasena"` | Cambia la contraseña de cualquier cuenta (por ejemplo, si el docente olvidó la suya) |
 | `npm run medir-calidad -- carpeta [--con-tutor]` | Mide la precisión de la transcripción y la latencia con audios reales (ver `docs/metricas-calidad.md`) |
+
+## Problemas frecuentes
+
+Ejecuta primero `npm run verificar`: revisa toda la configuración y dice qué falta. Al arrancar, el servidor también avisa en la consola (`[configuracion]` y `[bd]`).
+
+| Lo que se ve | Causa | Solución |
+|---|---|---|
+| "El servicio no está disponible en este momento" al registrarse o ingresar | El backend no tiene `DATABASE_URL` o no puede conectarse a Neon | Llena `DATABASE_URL` en `backend/.env` con la cadena de Neon → Connect y reinicia `npm run dev` |
+| `[bd] ✘ ... La contraseña de DATABASE_URL no es correcta` | Cambiaron la contraseña en Neon | Copia otra vez la cadena desde Neon → Connect |
+| "Thommy todavía no puede responder" | Falta `GROQ_API_KEY` | Crea la clave en https://console.groq.com/keys |
+| `Faltan migraciones` | La base de Neon está desactualizada | `npm run migrar` |
+
+`.env` siempre se lee de la carpeta `backend`, aunque el servidor se ejecute desde otra carpeta. Cada integrante necesita su propio `backend/.env`, porque ese archivo no se sube a GitHub. `GET /api/salud` muestra `baseDatos.estaConectada` (con el motivo si falla) e `ia.estaConfigurada`.
 
 ## Autenticación
 
