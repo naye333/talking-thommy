@@ -39,7 +39,9 @@ function crearApp () {
       return response.status(400).json({ error: 'JSON_INVALIDO' })
     }
     const estado = error.estado || 500
-    if (estado >= 500) console.error('[api]', error)
+    // Sin base de datos, una línea clara basta (el detalle ya se mostró al arrancar)
+    if (error.codigo === 'BASE_DATOS_NO_DISPONIBLE') console.warn('[api] petición rechazada: falta DATABASE_URL (ejecuta npm run verificar)')
+    else if (estado >= 500) console.error('[api]', error)
 
     const cuerpo = { error: estado >= 500 && !error.codigo ? 'ERROR_INTERNO' : error.codigo }
     if (error.detalles) cuerpo.detalles = error.detalles

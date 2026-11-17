@@ -13,8 +13,7 @@ API REST y servidor WebSocket del tutor conversacional. Node.js + Express + ws +
 cd backend
 npm install
 cp .env.example .env      # luego pega tu DATABASE_URL de Neon y tu GROQ_API_KEY
-npm run migrar            # crea las tablas en la base de datos
-npm run sembrar-syllabus  # carga el syllabus de Inglés I
+npm run verificar         # revisa que todo esté bien configurado
 npm run crear-docente -- profe@usta.edu.co "Nombre" "contrasena"   # muestra el código de grupo
 npm run dev
 ```
@@ -33,12 +32,16 @@ Verifica que todo esté arriba:
 | `npm start` | Arranca en modo normal (Render usa este) |
 | `npm test` | Pruebas con cobertura (mínimo 80 % de líneas) |
 | `npm run lint` | Revisa el estilo con StandardJS |
-| `npm run migrar` | Aplica las migraciones pendientes de `src/bd/migraciones` |
+| `npm run migrar` | Aplica las migraciones pendientes de `src/bd/migraciones` (el servidor también lo hace solo al arrancar) |
 | `npm run crear-docente -- correo "Nombre" "clave"` | Crea una cuenta de docente |
 | `npm run sembrar-syllabus [-- archivo.json]` | Carga o actualiza el syllabus (por defecto, todos los `semillas/syllabus-*.json`) |
 | `npm run asignar-docente -- correoDocente correoEstudiante...` | Asigna estudiantes a un docente (alternativa al código de grupo) |
 | `npm run restablecer-contrasena -- correo "NuevaContrasena"` | Cambia la contraseña de cualquier cuenta (por ejemplo, si el docente olvidó la suya) |
 | `npm run medir-calidad -- carpeta [--con-tutor]` | Mide la precisión de la transcripción y la latencia con audios reales (ver `docs/metricas-calidad.md`) |
+
+## Base de datos al día automáticamente
+
+Al arrancar (`npm run dev` o `npm start`), el servidor aplica las migraciones pendientes y, si no hay syllabus, lo carga. Nadie tiene que acordarse de `npm run migrar` después de un `git pull`. Si dos integrantes arrancan a la vez contra la misma base de Neon, un candado de PostgreSQL hace que el segundo espere. Para desactivarlo: `MIGRAR_AL_ARRANCAR=false`.
 
 ## Problemas frecuentes
 
@@ -220,8 +223,10 @@ pruebas/                    # Jest + supertest (la IA y la BD se simulan)
 
 ## Despliegue en Render
 
-1. New → Web Service → conectar el repositorio.
-2. Root directory: `backend` · Build: `npm install` · Start: `npm start`.
-3. Variables de entorno: `DATABASE_URL`, `ORIGENES_PERMITIDOS`, `JWT_SECRETO`, `GROQ_API_KEY` y `ENTORNO=produccion`.
+El archivo `render.yaml` (en la raíz del repositorio) deja todo configurado:
 
-El plan gratuito se duerme tras 15 minutos sin uso; abre `/api/salud` un minuto antes de una demo.
+1. En https://dashboard.render.com: **New → Blueprint** → elegir el repositorio `talking-thommy`.
+2. Render pide tres valores: `DATABASE_URL` (la cadena de Neon), `GROQ_API_KEY` y `ORIGENES_PERMITIDOS` (por ejemplo `http://localhost:8081`). `JWT_SECRETO` se genera solo.
+3. **Apply**. Render instala, arranca y aplica las migraciones. Comprueba con `https://<servicio>.onrender.com/api/salud`.
+
+El servidor usa el puerto que Render le asigna (`PORT`). En producción no arranca sin `DATABASE_URL`. El plan gratuito se duerme tras 15 minutos sin uso: abre `/api/salud` un minuto antes de una demo.
