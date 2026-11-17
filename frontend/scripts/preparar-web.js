@@ -19,8 +19,8 @@ const urlApi = process.env.URL_API
 if (urlApi) {
   const rutaConfig = join(DESTINO, 'js', 'config.js')
   const original = await readFile(rutaConfig, 'utf8')
-  const actualizado = original.replace(/urlApi: '[^']*'/, `urlApi: '${urlApi.replace(/\/$/, '')}'`)
-  if (actualizado === original) throw new Error('No se encontró urlApi en js/config.js')
+  const actualizado = original.replace(/const URL_API_FIJA = '[^']*'/, `const URL_API_FIJA = '${urlApi.replace(/\/$/, '')}'`)
+  if (actualizado === original) throw new Error('No se encontró URL_API_FIJA en js/config.js')
   await writeFile(rutaConfig, actualizado)
 }
 

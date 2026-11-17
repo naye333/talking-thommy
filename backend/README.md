@@ -221,12 +221,15 @@ src/
 pruebas/                    # Jest + supertest (la IA y la BD se simulan)
 ```
 
-## Despliegue en Render
+## Despliegue en Render (una sola dirección para todos)
+
+El backend también sirve la app web (carpeta `frontend`). En Render queda **un solo servicio con una sola dirección**: los estudiantes, el docente y el equipo solo abren esa URL en Chrome, sin instalar nada ni configurar `.env`.
 
 El archivo `render.yaml` (en la raíz del repositorio) deja todo configurado:
 
 1. En https://dashboard.render.com: **New → Blueprint** → elegir el repositorio `talking-thommy`.
-2. Render pide tres valores: `DATABASE_URL` (la cadena de Neon), `GROQ_API_KEY` y `ORIGENES_PERMITIDOS` (por ejemplo `http://localhost:8081`). `JWT_SECRETO` se genera solo.
-3. **Apply**. Render instala, arranca y aplica las migraciones. Comprueba con `https://<servicio>.onrender.com/api/salud`.
+2. Render pide dos valores: `DATABASE_URL` (la cadena de Neon) y `GROQ_API_KEY`. `JWT_SECRETO` se genera solo.
+3. **Apply**. Render instala, arranca y aplica las migraciones.
+4. La app queda en `https://<nombre-del-servicio>.onrender.com`. Para comprobarla: `/api/salud`.
 
-El servidor usa el puerto que Render le asigna (`PORT`). En producción no arranca sin `DATABASE_URL`. El plan gratuito se duerme tras 15 minutos sin uso: abre `/api/salud` un minuto antes de una demo.
+Solo se publican `index.html`, `css`, `js` y `assets` del frontend, nunca código ni configuración. El servidor usa el puerto que Render le asigna (`PORT`) y en producción no arranca sin `DATABASE_URL`. El plan gratuito se duerme tras 15 minutos sin uso: la primera visita tarda unos 30-50 segundos en despertar.

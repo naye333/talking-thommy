@@ -13,7 +13,11 @@ El estudiante conversa con Thommy siguiendo los temas del syllabus. La app trans
 | `docs/` | Acta de constitución, estándares del equipo y contratos de la API |
 | `src/` | Primer prototipo estático del login (KAN-4). La app vigente está en `frontend/` |
 
-## Puesta en marcha local
+## Usar la app
+
+La app está pensada para desplegarse en Render (ver `backend/README.md` → "Despliegue en Render"). Queda en una sola dirección, `https://<servicio>.onrender.com`, que todos abren en Chrome sin instalar nada.
+
+## Puesta en marcha local (solo para desarrollar)
 
 Backend (terminal 1):
 
@@ -21,12 +25,11 @@ Backend (terminal 1):
 cd backend
 npm install
 cp .env.example .env      # DATABASE_URL de Neon, JWT_SECRETO y GROQ_API_KEY
-npm run migrar
-npm run sembrar-syllabus
-npm run dev               # http://localhost:3000/api/salud
+npm run verificar         # revisa la configuración
+npm run dev               # aplica las migraciones y sirve la app en http://localhost:3000
 ```
 
-Frontend (terminal 2):
+Con eso, la app completa ya funciona en http://localhost:3000 (el backend la sirve). Para trabajar en el frontend con recarga, en otra terminal:
 
 ```bash
 cd frontend
