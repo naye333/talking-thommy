@@ -16,10 +16,13 @@ if (!jwtSecreto) {
 // Centraliza la lectura de variables de entorno con valores por defecto seguros
 const entorno = {
   rutaEnv: RUTA_ENV,
-  puerto: Number(process.env.PUERTO) || 3000,
+  // PORT es la variable que usa Render; PUERTO, la del .env local
+  puerto: Number(process.env.PUERTO || process.env.PORT) || 3000,
   nombreEntorno,
   esProduccion,
   urlBaseDatos: process.env.DATABASE_URL || '',
+  // Aplica migraciones pendientes (y el syllabus si falta) al arrancar. MIGRAR_AL_ARRANCAR=false lo desactiva.
+  migrarAlArrancar: process.env.MIGRAR_AL_ARRANCAR !== 'false',
   origenesPermitidos: (process.env.ORIGENES_PERMITIDOS || '')
     .split(',')
     .map((origen) => origen.trim())

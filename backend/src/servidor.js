@@ -4,6 +4,7 @@ const { crearApp } = require('./app')
 const { crearServidorWebSocket } = require('./tiempo-real/manejadorWebSocket')
 const { cerrarPool, verificarConexion } = require('./config/baseDatos')
 const { revisarConfiguracion, formatearProblema, explicarErrorBaseDatos } = require('./config/diagnostico')
+const { prepararBaseDatos } = require('./bd/prepararBaseDatos')
 
 // REST y WebSocket comparten el mismo puerto (necesario en Render)
 // opciones se pasa al WebSocket (permite reemplazar la IA y la BD en pruebas)
@@ -35,8 +36,19 @@ async function avisarConfiguracion () {
   if (!entorno.urlBaseDatos) return
 
   const { estaConectada, motivo } = await verificarConexion()
-  if (estaConectada) console.log('[bd] conectada a la base de datos')
-  else console.warn(`[bd] ✘ no se pudo conectar: ${explicarErrorBaseDatos(motivo)}`)
+  if (!estaConectada) {
+    console.warn(`[bd] ✘ no se pudo conectar: ${explicarErrorBaseDatos(motivo)}`)
+    return
+  }
+  console.log('[bd] conectada a la base de datos')
+  if (!entorno.migrarAlArrancar) return
+  try {
+    await prepararBaseDatos()
+  } catch (error) {
+    // En producción no se sirve con la base a medias; en desarrollo se avisa y se sigue
+    if (entorno.esProduccion) throw new Error(`no se pudo preparar la base de datos: ${error.message}`)
+    console.warn(`[bd] ✘ no se pudo preparar la base de datos: ${error.message}`)
+  }
 }
 
 // Inicia el servidor y registra el apagado ordenado con Ctrl + C o la señal de Render

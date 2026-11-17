@@ -30,6 +30,12 @@ describe('arrancar', () => {
   })
 })
 
+jest.mock('../src/bd/prepararBaseDatos', () => ({ prepararBaseDatos: jest.fn(async () => ({ migraciones: [], sembroSyllabus: false })) }))
+jest.mock('../src/config/baseDatos', () => {
+  const real = jest.requireActual('../src/config/baseDatos')
+  return { ...real, verificarConexion: jest.fn(real.verificarConexion) }
+})
+
 describe('avisarConfiguracion', () => {
   const entorno = require('../src/config/entorno')
   const original = { ...entorno }
@@ -57,5 +63,36 @@ describe('avisarConfiguracion', () => {
     await avisarConfiguracion()
     expect(console.warn.mock.calls.flat().join(' ')).toMatch(/\[bd\] ✘ no se pudo conectar/)
     await require('../src/config/baseDatos').cerrarPool()
+  })
+
+  test('con conexión, prepara la base de datos (migraciones y syllabus)', async () => {
+    const { prepararBaseDatos } = require('../src/bd/prepararBaseDatos')
+    const baseDatos = require('../src/config/baseDatos')
+    baseDatos.verificarConexion.mockResolvedValueOnce({ estaConectada: true })
+    jest.spyOn(console, 'log').mockImplementation(() => {})
+    Object.assign(entorno, { urlBaseDatos: 'postgresql://u:c@host/db', esProduccion: false, migrarAlArrancar: true })
+    await avisarConfiguracion()
+    expect(prepararBaseDatos).toHaveBeenCalled()
+
+    // En desarrollo, si falla, solo avisa; en producción no arranca
+    prepararBaseDatos.mockRejectedValueOnce(new Error('falló 004'))
+    baseDatos.verificarConexion.mockResolvedValueOnce({ estaConectada: true })
+    await avisarConfiguracion()
+    expect(console.warn.mock.calls.flat().join(' ')).toMatch(/no se pudo preparar/)
+
+    prepararBaseDatos.mockRejectedValueOnce(new Error('falló 004'))
+    baseDatos.verificarConexion.mockResolvedValueOnce({ estaConectada: true })
+    Object.assign(entorno, { esProduccion: true })
+    await expect(avisarConfiguracion()).rejects.toThrow(/no se pudo preparar/)
+  })
+
+  test('con MIGRAR_AL_ARRANCAR=false no toca la base de datos', async () => {
+    const { prepararBaseDatos } = require('../src/bd/prepararBaseDatos')
+    prepararBaseDatos.mockClear()
+    require('../src/config/baseDatos').verificarConexion.mockResolvedValueOnce({ estaConectada: true })
+    jest.spyOn(console, 'log').mockImplementation(() => {})
+    Object.assign(entorno, { urlBaseDatos: 'postgresql://u:c@host/db', esProduccion: false, migrarAlArrancar: false })
+    await avisarConfiguracion()
+    expect(prepararBaseDatos).not.toHaveBeenCalled()
   })
 })

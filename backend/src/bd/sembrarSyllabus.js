@@ -41,7 +41,7 @@ async function guardarUnidad (cliente, unidad) {
   return unidad.temas.length
 }
 
-async function sembrarSyllabus (rutaArchivo) {
+async function sembrarSyllabus (rutaArchivo, { log = console.log } = {}) {
   const datos = JSON.parse(fs.readFileSync(rutaArchivo, 'utf8'))
   const errores = validarSyllabus(datos)
   if (errores.length > 0) {
@@ -57,7 +57,7 @@ async function sembrarSyllabus (rutaArchivo) {
     let totalTemas = 0
     for (const unidad of datos.unidades) totalTemas += await guardarUnidad(cliente, unidad)
     await cliente.query('COMMIT')
-    console.log(`[syllabus] ${datos.unidades.length} unidades y ${totalTemas} temas cargados desde ${path.basename(rutaArchivo)}`)
+    log(`[syllabus] ${datos.unidades.length} unidades y ${totalTemas} temas cargados desde ${path.basename(rutaArchivo)}`)
   } catch (error) {
     await cliente.query('ROLLBACK')
     throw error
@@ -66,14 +66,18 @@ async function sembrarSyllabus (rutaArchivo) {
   }
 }
 
-async function sembrarTodo (rutaArchivo) {
+async function sembrarTodo (rutaArchivo, opciones) {
   const archivos = rutaArchivo ? [rutaArchivo] : archivosPorDefecto()
-  for (const archivo of archivos) await sembrarSyllabus(archivo)
+  for (const archivo of archivos) await sembrarSyllabus(archivo, opciones)
 }
 
-sembrarTodo(process.argv[2])
-  .finally(cerrarPool)
-  .catch((error) => {
-    console.error('[syllabus] ERROR:', error.message)
-    process.exitCode = 1
-  })
+if (require.main === module) {
+  sembrarTodo(process.argv[2])
+    .finally(cerrarPool)
+    .catch((error) => {
+      console.error('[syllabus] ERROR:', error.message)
+      process.exitCode = 1
+    })
+}
+
+module.exports = { sembrarTodo }
