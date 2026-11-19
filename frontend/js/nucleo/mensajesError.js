@@ -19,10 +19,14 @@ const MENSAJES = {
   MICROFONO_DENEGADO: 'Necesitamos permiso para usar el micrófono. Actívalo en la configuración del dispositivo.',
   MICROFONO_NO_ENCONTRADO: 'No encontramos un micrófono en este dispositivo.',
   MICROFONO_NO_DISPONIBLE: 'El micrófono no está disponible en este dispositivo.',
+  MICROFONO_SIN_SONIDO: 'No llega sonido del micrófono. Revisa que no esté silenciado y que el navegador use el micrófono correcto (ícono del candado junto a la dirección).',
   AUDIO_VACIO: 'No escuchamos nada. Mantén el micrófono cerca e inténtalo de nuevo.',
   AUDIO_DEMASIADO_GRANDE: 'La grabación es muy larga. Intenta con una frase más corta.',
-  TUTOR_NO_DISPONIBLE: 'Thommy todavía no puede responder desde el servidor. Intenta más tarde.',
+  TUTOR_NO_DISPONIBLE: 'Thommy no está disponible en este momento. Intenta más tarde.',
+  AUDIO_NO_ENTENDIDO: 'Thommy no te escuchó bien. Habla un poco más fuerte y cerca del micrófono.',
+  AUDIO_INVALIDO: 'No pudimos procesar la grabación. Inténtalo de nuevo.',
   SESION_REQUERIDA: 'No se pudo iniciar la conversación. Intenta de nuevo.',
+  SESION_NO_ENCONTRADA: 'La conversación terminó. Vuelve a entrar para practicar de nuevo.',
   ERROR_PROCESAMIENTO: 'Thommy no pudo procesar tu audio. Intenta de nuevo.',
   ERROR_INTERNO: 'Ocurrió un error inesperado. Intenta de nuevo.'
 }

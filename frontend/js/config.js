@@ -10,11 +10,12 @@ export const configuracion = Object.freeze({
   usarDatosEjemploProgreso: true,
 
   // Conversación con Thommy:
-  //   'ejemplo'    → tutor simulado en el frontend (el backend aún no transcribe ni evalúa)
-  //   'tiempoReal' → POST /api/sesiones + WebSocket /tiempo-real (ver docs/contrato-api-perfil-estudiante.md)
-  modoConversacion: 'ejemplo',
+  //   'tiempoReal' → IA real: POST /api/sesiones + WebSocket /tiempo-real (ver docs/contrato-api-perfil-estudiante.md).
+  //                  Requiere el backend y el servicio de IA (ia/) encendidos.
+  //   'ejemplo'    → tutor simulado en el frontend, sin backend (útil para trabajar solo en la interfaz)
+  modoConversacion: 'tiempoReal',
 
   // Modo 'tiempoReal': cuánto esperar la respuesta del servidor (conexión y resultado de cada turno)
-  // antes de mostrar SIN_CONEXION. Ajustar según la latencia que mida el equipo de IA.
-  tiempoMaximoRespuestaMs: 30000
+  // antes de mostrar SIN_CONEXION. Medido por IA en un PC de 8 GB sin GPU: 5-20 s por turno.
+  tiempoMaximoRespuestaMs: 90000
 })

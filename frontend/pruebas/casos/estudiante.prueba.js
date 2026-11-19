@@ -5,6 +5,7 @@ import { crearClienteTiempoReal, construirUrlTiempoReal } from '../../js/servici
 import { crearServicioProgreso } from '../../js/servicios/estudiante/servicioProgreso.js'
 import { validarFormularioRegistro } from '../../js/perfiles/comun/pantallas/registro.js'
 import { resolverUrlAudio, puedeEscuchar, escucharThommy, callar } from '../../js/servicios/estudiante/voz.js'
+import { textoHablado, etiquetaPuntaje, esGrabacionSilenciosa } from '../../js/perfiles/estudiante/pantallas/conversacion.js'
 
 const TEMA = { id: 3, titulo: 'Introducing yourself', frasesModelo: ['Hi, let me introduce myself.', 'Nice to meet you.'] }
 
@@ -138,6 +139,54 @@ describir('estudiante', (prueba) => {
     afirmar.igual(resolverUrlAudio('javascript:alert(1)', 'https://api.ejemplo.co'), null)
     afirmar.igual(resolverUrlAudio(null), null)
     afirmar.igual(resolverUrlAudio(''), null)
+  })
+
+  prueba('acepta el audio de Thommy embebido en el mensaje (data:audio) y rechaza otros data:', () => {
+    afirmar.igual(resolverUrlAudio('data:audio/mpeg;base64,SUQzBAA='), 'data:audio/mpeg;base64,SUQzBAA=')
+    afirmar.igual(resolverUrlAudio('data:audio/wav;base64,UklGRg==', 'https://api.ejemplo.co'), 'data:audio/wav;base64,UklGRg==')
+    afirmar.igual(resolverUrlAudio('data:text/html;base64,PHNjcmlwdD4='), null)
+    afirmar.igual(resolverUrlAudio('data:audio/mpeg;base64,<script>'), null)
+  })
+
+  prueba('avisa cuándo Thommy empieza y termina de hablar (para animar al avatar)', async () => {
+    const { AudioFalso, creados } = crearAudioFalso()
+    const estados = []
+    escucharThommy({ texto: 'Yay!', audioUrl: 'data:audio/mpeg;base64,SUQz' }, { AudioImpl: AudioFalso, leer: () => true, alCambiar: (hablando) => estados.push(hablando) })
+    creados[0].dispatchEvent(new Event('playing'))
+    creados[0].dispatchEvent(new Event('ended'))
+    afirmar.profundo(estados, [true, false])
+
+    // callar también apaga la animación
+    escucharThommy({ texto: 'Yay!', audioUrl: 'data:audio/mpeg;base64,SUQz' }, { AudioImpl: AudioFalso, leer: () => true, alCambiar: (hablando) => estados.push(hablando) })
+    creados[1].dispatchEvent(new Event('playing'))
+    callar()
+    afirmar.profundo(estados, [true, false, true, false])
+  })
+
+  prueba('con la voz del dispositivo también se anima y se detiene al terminar de leer', () => {
+    const estados = []
+    let terminarLectura
+    escucharThommy({ texto: 'Hi!', audioUrl: null }, {
+      AudioImpl: null,
+      leer: (_texto, alTerminar) => { terminarLectura = alTerminar; return true },
+      alCambiar: (hablando) => estados.push(hablando)
+    })
+    terminarLectura()
+    afirmar.profundo(estados, [true, false])
+  })
+
+  prueba('detecta un micrófono que solo entrega silencio absoluto', () => {
+    afirmar.igual(esGrabacionSilenciosa({ maximo: 0, mediciones: 120 }), true)
+    afirmar.igual(esGrabacionSilenciosa({ maximo: 0.03, mediciones: 120 }), false) // ruido de fondo o voz
+    afirmar.igual(esGrabacionSilenciosa({ maximo: 0, mediciones: 3 }), false) // sin datos suficientes: se envía
+    afirmar.igual(esGrabacionSilenciosa(null), false)
+  })
+
+  prueba('Thommy dice su texto junto con la frase a practicar, y el puntaje usa la etiqueta del backend', () => {
+    afirmar.igual(textoHablado({ texto: 'Try saying this:', frase: 'Nice to meet you.' }), 'Try saying this: Nice to meet you.')
+    afirmar.igual(textoHablado({ texto: 'What do you like?', frase: null }), 'What do you like?')
+    afirmar.igual(etiquetaPuntaje({ etiqueta: 'Palabras entendidas' }), 'Palabras entendidas')
+    afirmar.igual(etiquetaPuntaje({}), 'Pronunciación')
   })
 
   prueba('sin audioUrl, Thommy se escucha con la voz del dispositivo', () => {
