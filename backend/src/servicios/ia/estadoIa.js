@@ -23,11 +23,18 @@ const MENSAJES = {
 
 let ultimo = null
 let enCurso = null
+// Modelos que Groq rechazó al usarlos (aunque aparezcan en la lista): no se vuelven a elegir
+const modelosRechazados = new Set()
 
-function elegirModelo (clase, disponibles) {
+function elegirModelo (clase, listados) {
+  const disponibles = listados.filter((id) => !modelosRechazados.has(id))
   const configurado = MODELOS_CONFIGURADOS[clase]
   if (disponibles.includes(configurado)) return configurado
   return PREFERIDOS[clase].find((id) => disponibles.includes(id)) || disponibles.find(ES_DE_CLASE[clase]) || null
+}
+
+function marcarModeloRechazado (modelo) {
+  if (modelo) modelosRechazados.add(modelo)
 }
 
 function resultado (estado, extra = {}) {
@@ -83,10 +90,11 @@ function estadoIaReciente () {
 }
 
 function reiniciarEstadoIa () {
+  modelosRechazados.clear()
   ultimo = null
   enCurso = null
   entorno.modeloTranscripcion = MODELOS_CONFIGURADOS.transcripcion
   entorno.modeloTutor = MODELOS_CONFIGURADOS.tutor
 }
 
-module.exports = { revisarIa, estadoIaReciente, reiniciarEstadoIa, elegirModelo }
+module.exports = { revisarIa, estadoIaReciente, reiniciarEstadoIa, elegirModelo, marcarModeloRechazado }

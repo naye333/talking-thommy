@@ -13,6 +13,7 @@ describe('estado de la IA (Groq)', () => {
     reiniciarEstadoIa()
     global.fetch = jest.fn()
     jest.spyOn(console, 'error').mockImplementation(() => {})
+    jest.spyOn(console, 'warn').mockImplementation(() => {})
   })
 
   afterEach(() => {
@@ -81,6 +82,16 @@ describe('estado de la IA (Groq)', () => {
     global.fetch.mockResolvedValueOnce(respuesta(401, { error: 'invalid_api_key' }))
     await expect(transcribirAudio(Buffer.from([0x1a, 0x45, 0xdf, 0xa3, 0, 0]))).rejects.toMatchObject({ codigo: 'IA_CLAVE_INVALIDA' })
     expect(global.fetch).toHaveBeenCalledTimes(1)
+  })
+
+  test('si Groq sigue listando el modelo pero lo rechaza, elige otro', async () => {
+    global.fetch
+      .mockResolvedValueOnce(respuesta(404, { error: { code: 'model_not_found' } }))
+      .mockResolvedValueOnce(modelos('whisper-large-v3-turbo', 'llama-3.3-70b-versatile', 'openai/gpt-oss-120b'))
+      .mockResolvedValueOnce(respuesta(200, { choices: [{ message: { content: '{"respuesta":"Hi"}' } }] }))
+    expect(await completarJson([])).toEqual({ respuesta: 'Hi' })
+    expect(JSON.parse(global.fetch.mock.calls[2][1].body).model).toBe('openai/gpt-oss-120b')
+    expect(console.warn.mock.calls.flat().join(' ')).toMatch(/rechazó el modelo llama-3.3-70b-versatile/)
   })
 
   test('si no hay otro modelo, no reintenta', async () => {

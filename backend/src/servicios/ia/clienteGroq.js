@@ -30,13 +30,17 @@ function codigoSegunRespuesta (estado, detalle) {
 }
 
 // Si Groq retiró el modelo, se elige otro disponible y se reintenta una vez
-async function conReintentoDeModelo (llamar) {
+// obtenerModelo devuelve el modelo que usa la llamada (puede cambiar tras la revisión)
+async function conReintentoDeModelo (obtenerModelo, llamar) {
+  const modelo = obtenerModelo()
   try {
     return await llamar()
   } catch (error) {
     if (error.codigo !== 'IA_MODELO_NO_DISPONIBLE') throw error
+    estadoIa.marcarModeloRechazado(modelo)
     const estado = await estadoIa.revisarIa({ forzar: true })
-    if (estado.estado !== 'ok') throw error
+    if (estado.estado !== 'ok' || obtenerModelo() === modelo) throw error
+    console.warn(`[ia] ! Groq rechazó el modelo ${modelo}; se usa ${obtenerModelo()}`)
     return llamar()
   }
 }
@@ -67,7 +71,7 @@ async function transcribirAudio (audio) {
   const formato = detectarFormatoAudio(audio)
   if (!formato) throw crearError(415, 'FORMATO_AUDIO_NO_SOPORTADO')
 
-  const datos = await conReintentoDeModelo(() => {
+  const datos = await conReintentoDeModelo(() => entorno.modeloTranscripcion, () => {
     // El formulario se arma en cada intento porque el modelo puede cambiar
     const formulario = new FormData()
     formulario.append('file', new Blob([audio], { type: formato.tipo }), `turno.${formato.extension}`)
@@ -91,7 +95,7 @@ async function transcribirAudio (audio) {
 // Envía la conversación y devuelve el objeto JSON que produce el modelo
 async function completarJson (mensajes, { temperatura = 0.4 } = {}) {
   exigirClave()
-  const datos = await conReintentoDeModelo(() => llamarGroq('/chat/completions', {
+  const datos = await conReintentoDeModelo(() => entorno.modeloTutor, () => llamarGroq('/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
