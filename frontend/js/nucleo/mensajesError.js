@@ -32,6 +32,8 @@ const MENSAJES = {
   TRANSCRIPCION_VACIA: 'No entendimos lo que dijiste. Habla un poco más fuerte y claro.',
   FORMATO_AUDIO_NO_SOPORTADO: 'Este dispositivo graba en un formato que no podemos analizar.',
   IA_NO_DISPONIBLE: 'Thommy no está disponible en este momento. Intenta de nuevo en un rato.',
+  IA_CLAVE_INVALIDA: 'Thommy no puede responder: la clave de la IA no es válida. Avisa al equipo del proyecto.',
+  IA_MODELO_NO_DISPONIBLE: 'Thommy no puede responder: el modelo de IA no está disponible. Avisa al equipo del proyecto.',
   IA_TIEMPO_AGOTADO: 'Thommy tardó demasiado en responder. Intenta de nuevo.',
   IA_LIMITE_ALCANZADO: 'Thommy está atendiendo a muchos estudiantes. Espera un minuto e inténtalo de nuevo.',
   IA_RESPUESTA_INVALIDA: 'Thommy no pudo responder esta vez. Intenta de nuevo.',

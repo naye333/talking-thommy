@@ -66,6 +66,9 @@ describe('clienteGroq', () => {
     global.fetch.mockResolvedValueOnce(respuestaJson({ error: 'limite' }, 429))
     await expect(completarJson([])).rejects.toMatchObject({ codigo: 'IA_LIMITE_ALCANZADO' })
 
+    global.fetch.mockResolvedValueOnce(respuestaJson({ error: 'clave' }, 401))
+    await expect(completarJson([])).rejects.toMatchObject({ codigo: 'IA_CLAVE_INVALIDA' })
+
     global.fetch.mockResolvedValueOnce(respuestaJson({ error: 'caido' }, 500))
     await expect(completarJson([])).rejects.toMatchObject({ codigo: 'IA_NO_DISPONIBLE' })
 

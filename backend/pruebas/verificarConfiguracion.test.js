@@ -16,6 +16,8 @@ jest.mock('../src/config/baseDatos', () => ({
 
 const entorno = require('../src/config/entorno')
 const { verificar } = require('../src/herramientas/verificarConfiguracion')
+const { reiniciarEstadoIa } = require('../src/servicios/ia/estadoIa')
+const modelosGroq = { data: [{ id: 'whisper-large-v3-turbo' }, { id: 'llama-3.3-70b-versatile' }] }
 
 function ejecutar () {
   const lineas = []
@@ -33,7 +35,8 @@ describe('npm run verificar', () => {
       'FROM temas': [{ total: '10' }],
       "rol = 'docente'": [{ total: '1' }]
     }
-    global.fetch = jest.fn(async () => ({ ok: true, status: 200 }))
+    global.fetch = jest.fn(async () => ({ ok: true, status: 200, json: async () => modelosGroq }))
+    reiniciarEstadoIa()
   })
 
   afterEach(() => {
@@ -45,7 +48,7 @@ describe('npm run verificar', () => {
     const { errores, texto } = await ejecutar()
     expect(errores).toBe(0)
     expect(texto).toMatch(/Syllabus cargado \(10 temas\)/)
-    expect(texto).toMatch(/Clave de Groq válida/)
+    expect(texto).toMatch(/Groq listo/)
     expect(texto).toMatch(/Todo listo/)
   })
 
@@ -72,12 +75,12 @@ describe('npm run verificar', () => {
     const { errores, texto } = await ejecutar()
     expect(errores).toBe(2)
     expect(texto).toMatch(/La contraseña de DATABASE_URL no es correcta/)
-    expect(texto).toMatch(/Groq rechazó la clave/)
+    expect(texto).toMatch(/Groq rechazó GROQ_API_KEY/)
   })
 
   test('Groq caído o sin red', async () => {
     global.fetch = jest.fn(async () => ({ ok: false, status: 500 }))
-    expect((await ejecutar()).texto).toMatch(/Groq respondió 500/)
+    expect((await ejecutar()).texto).toMatch(/Groq respondió con un error/)
     global.fetch = jest.fn(async () => { throw new Error('sin red') })
     expect((await ejecutar()).texto).toMatch(/No se pudo contactar a Groq/)
   })

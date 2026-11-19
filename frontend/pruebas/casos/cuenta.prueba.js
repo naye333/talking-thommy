@@ -62,5 +62,7 @@ describir('cuenta', (prueba) => {
     afirmar.verdadero(obtenerMensajeError({ codigo: 'DEMASIADOS_INTENTOS' }).includes('15 minutos'))
     afirmar.verdadero(obtenerMensajeError({ codigo: 'CODIGO_GRUPO_INVALIDO' }).includes('código'))
     afirmar.verdadero(obtenerMensajeError({ codigo: 'IA_LIMITE_ALCANZADO' }).includes('Thommy'))
+    afirmar.verdadero(obtenerMensajeError({ codigo: 'IA_CLAVE_INVALIDA' }).includes('clave'))
+    afirmar.verdadero(obtenerMensajeError({ codigo: 'IA_MODELO_NO_DISPONIBLE' }).includes('modelo'))
   })
 })

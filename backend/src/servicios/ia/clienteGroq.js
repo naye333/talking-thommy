@@ -20,6 +20,26 @@ function exigirClave () {
   if (!entorno.groqApiKey) throw crearError(503, 'TUTOR_NO_DISPONIBLE')
 }
 
+// Traduce la respuesta de Groq a un código que explica la causa
+function codigoSegunRespuesta (estado, detalle) {
+  if (estado === 401 || estado === 403) return 'IA_CLAVE_INVALIDA'
+  if (estado === 429) return 'IA_LIMITE_ALCANZADO'
+  if (estado === 404 || /model_(not_found|decommissioned)|does not exist|decommissioned/i.test(detalle)) return 'IA_MODELO_NO_DISPONIBLE'
+  return 'IA_NO_DISPONIBLE'
+}
+
+// Si Groq retiró el modelo, se elige otro disponible y se reintenta una vez
+async function conReintentoDeModelo (llamar) {
+  try {
+    return await llamar()
+  } catch (error) {
+    if (error.codigo !== 'IA_MODELO_NO_DISPONIBLE') throw error
+    const estado = await require('./estadoIa').revisarIa({ forzar: true })
+    if (estado.estado !== 'ok') throw error
+    return llamar()
+  }
+}
+
 async function llamarGroq (ruta, opciones) {
   let respuesta
   try {
@@ -35,7 +55,7 @@ async function llamarGroq (ruta, opciones) {
   if (!respuesta.ok) {
     const detalle = await respuesta.text().catch(() => '')
     console.error(`[ia] Groq respondió ${respuesta.status} en ${ruta}: ${detalle.slice(0, 300)}`)
-    throw crearError(502, respuesta.status === 429 ? 'IA_LIMITE_ALCANZADO' : 'IA_NO_DISPONIBLE')
+    throw crearError(502, codigoSegunRespuesta(respuesta.status, detalle))
   }
   return respuesta.json()
 }
@@ -46,14 +66,16 @@ async function transcribirAudio (audio) {
   const formato = detectarFormatoAudio(audio)
   if (!formato) throw crearError(415, 'FORMATO_AUDIO_NO_SOPORTADO')
 
-  const formulario = new FormData()
-  formulario.append('file', new Blob([audio], { type: formato.tipo }), `turno.${formato.extension}`)
-  formulario.append('model', entorno.modeloTranscripcion)
-  formulario.append('language', 'en')
-  formulario.append('response_format', 'verbose_json')
-  formulario.append('temperature', '0')
-
-  const datos = await llamarGroq('/audio/transcriptions', { method: 'POST', body: formulario })
+  const datos = await conReintentoDeModelo(() => {
+    // El formulario se arma en cada intento porque el modelo puede cambiar
+    const formulario = new FormData()
+    formulario.append('file', new Blob([audio], { type: formato.tipo }), `turno.${formato.extension}`)
+    formulario.append('model', entorno.modeloTranscripcion)
+    formulario.append('language', 'en')
+    formulario.append('response_format', 'verbose_json')
+    formulario.append('temperature', '0')
+    return llamarGroq('/audio/transcriptions', { method: 'POST', body: formulario })
+  })
   return {
     texto: (datos.text || '').trim(),
     duracion: Number(datos.duration) || 0,
@@ -68,7 +90,7 @@ async function transcribirAudio (audio) {
 // Envía la conversación y devuelve el objeto JSON que produce el modelo
 async function completarJson (mensajes, { temperatura = 0.4 } = {}) {
   exigirClave()
-  const datos = await llamarGroq('/chat/completions', {
+  const datos = await conReintentoDeModelo(() => llamarGroq('/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -78,7 +100,7 @@ async function completarJson (mensajes, { temperatura = 0.4 } = {}) {
       max_tokens: 700,
       response_format: { type: 'json_object' }
     })
-  })
+  }))
   try {
     return JSON.parse(datos.choices[0].message.content)
   } catch {
@@ -86,4 +108,4 @@ async function completarJson (mensajes, { temperatura = 0.4 } = {}) {
   }
 }
 
-module.exports = { detectarFormatoAudio, transcribirAudio, completarJson }
+module.exports = { detectarFormatoAudio, transcribirAudio, completarJson, codigoSegunRespuesta }
