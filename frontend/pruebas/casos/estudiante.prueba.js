@@ -4,7 +4,7 @@ import { crearServicioConversacion } from '../../js/servicios/estudiante/servici
 import { crearClienteTiempoReal, construirUrlTiempoReal } from '../../js/servicios/estudiante/clienteTiempoReal.js'
 import { crearServicioProgreso } from '../../js/servicios/estudiante/servicioProgreso.js'
 import { validarFormularioRegistro } from '../../js/perfiles/comun/pantallas/registro.js'
-import { resolverUrlAudio, puedeEscuchar, escucharThommy, callar } from '../../js/servicios/estudiante/voz.js'
+import { resolverUrlAudio, puedeEscuchar, escucharThommy, callar, elegirVozThommy } from '../../js/servicios/estudiante/voz.js'
 
 const TEMA = { id: 3, titulo: 'Introducing yourself', frasesModelo: ['Hi, let me introduce myself.', 'Nice to meet you.'] }
 
@@ -138,6 +138,21 @@ describir('estudiante', (prueba) => {
     afirmar.igual(resolverUrlAudio('javascript:alert(1)', 'https://api.ejemplo.co'), null)
     afirmar.igual(resolverUrlAudio(null), null)
     afirmar.igual(resolverUrlAudio(''), null)
+  })
+
+  prueba('Thommy elige una voz masculina en inglés (con tono alto suena a niño) y no la femenina por defecto', () => {
+    const zira = { name: 'Microsoft Zira - English (United States)', lang: 'en-US', localService: true }
+    const david = { name: 'Microsoft David - English (United States)', lang: 'en-US', localService: true }
+    const guyOnline = { name: 'Microsoft Guy Online (Natural) - English (United States)', lang: 'en-US', localService: false }
+    const sabina = { name: 'Microsoft Sabina - Spanish (Mexico)', lang: 'es-MX', localService: true }
+    const georgeUk = { name: 'Microsoft George - English (United Kingdom)', lang: 'en-GB', localService: true }
+    afirmar.igual(elegirVozThommy([zira, sabina, guyOnline, david]), david)
+    afirmar.igual(elegirVozThommy([zira, guyOnline]), guyOnline)
+    afirmar.igual(elegirVozThommy([zira, georgeUk]), georgeUk)
+    afirmar.igual(elegirVozThommy([sabina, zira]), zira)
+    afirmar.igual(elegirVozThommy([sabina]), null)
+    afirmar.igual(elegirVozThommy([]), null)
+    afirmar.igual(elegirVozThommy(undefined), null)
   })
 
   prueba('sin audioUrl, Thommy se escucha con la voz del dispositivo', () => {
