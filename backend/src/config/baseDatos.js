@@ -11,7 +11,9 @@ function obtenerPool () {
       // El SSL lo define la cadena de Neon (?sslmode=require)
       connectionString: entorno.urlBaseDatos,
       max: 10,
-      idleTimeoutMillis: 30000
+      idleTimeoutMillis: 30000,
+      // Si Neon no responde, falla en 10 s en vez de dejar el servidor esperando
+      connectionTimeoutMillis: 10000
     })
     pool.on('error', (error) => {
       console.error('[bd] error inesperado en el pool:', error.message)

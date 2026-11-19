@@ -1,4 +1,8 @@
-require('dotenv').config()
+const path = require('path')
+
+// Siempre se lee backend/.env, sin importar desde qué carpeta se ejecute el servidor
+const RUTA_ENV = path.join(__dirname, '..', '..', '.env')
+require('dotenv').config({ path: RUTA_ENV, quiet: true })
 
 const nombreEntorno = process.env.ENTORNO || 'desarrollo'
 const esProduccion = nombreEntorno === 'produccion'
@@ -11,10 +15,14 @@ if (!jwtSecreto) {
 
 // Centraliza la lectura de variables de entorno con valores por defecto seguros
 const entorno = {
-  puerto: Number(process.env.PUERTO) || 3000,
+  rutaEnv: RUTA_ENV,
+  // PORT es la variable que usa Render; PUERTO, la del .env local
+  puerto: Number(process.env.PUERTO || process.env.PORT) || 3000,
   nombreEntorno,
   esProduccion,
   urlBaseDatos: process.env.DATABASE_URL || '',
+  // Aplica migraciones pendientes (y el syllabus si falta) al arrancar. MIGRAR_AL_ARRANCAR=false lo desactiva.
+  migrarAlArrancar: process.env.MIGRAR_AL_ARRANCAR !== 'false',
   origenesPermitidos: (process.env.ORIGENES_PERMITIDOS || '')
     .split(',')
     .map((origen) => origen.trim())

@@ -13,8 +13,7 @@ API REST y servidor WebSocket del tutor conversacional. Node.js + Express + ws +
 cd backend
 npm install
 cp .env.example .env      # luego pega tu DATABASE_URL de Neon y tu GROQ_API_KEY
-npm run migrar            # crea las tablas en la base de datos
-npm run sembrar-syllabus  # carga el syllabus de Inglés I
+npm run verificar         # revisa que todo esté bien configurado
 npm run crear-docente -- profe@usta.edu.co "Nombre" "contrasena"   # muestra el código de grupo
 npm run dev
 ```
@@ -28,16 +27,34 @@ Verifica que todo esté arriba:
 
 | Comando | Qué hace |
 |---|---|
+| `npm run verificar` | Revisa `.env`, la conexión a Neon, las tablas, el syllabus, los docentes y la clave de Groq, y dice cómo arreglar lo que falte |
 | `npm run dev` | Arranca con recarga automática |
 | `npm start` | Arranca en modo normal (Render usa este) |
 | `npm test` | Pruebas con cobertura (mínimo 80 % de líneas) |
 | `npm run lint` | Revisa el estilo con StandardJS |
-| `npm run migrar` | Aplica las migraciones pendientes de `src/bd/migraciones` |
+| `npm run migrar` | Aplica las migraciones pendientes de `src/bd/migraciones` (el servidor también lo hace solo al arrancar) |
 | `npm run crear-docente -- correo "Nombre" "clave"` | Crea una cuenta de docente |
 | `npm run sembrar-syllabus [-- archivo.json]` | Carga o actualiza el syllabus (por defecto, todos los `semillas/syllabus-*.json`) |
 | `npm run asignar-docente -- correoDocente correoEstudiante...` | Asigna estudiantes a un docente (alternativa al código de grupo) |
 | `npm run restablecer-contrasena -- correo "NuevaContrasena"` | Cambia la contraseña de cualquier cuenta (por ejemplo, si el docente olvidó la suya) |
 | `npm run medir-calidad -- carpeta [--con-tutor]` | Mide la precisión de la transcripción y la latencia con audios reales (ver `docs/metricas-calidad.md`) |
+
+## Base de datos al día automáticamente
+
+Al arrancar (`npm run dev` o `npm start`), el servidor aplica las migraciones pendientes y, si no hay syllabus, lo carga. Nadie tiene que acordarse de `npm run migrar` después de un `git pull`. Si dos integrantes arrancan a la vez contra la misma base de Neon, un candado de PostgreSQL hace que el segundo espere. Para desactivarlo: `MIGRAR_AL_ARRANCAR=false`.
+
+## Problemas frecuentes
+
+Ejecuta primero `npm run verificar`: revisa toda la configuración y dice qué falta. Al arrancar, el servidor también avisa en la consola (`[configuracion]` y `[bd]`).
+
+| Lo que se ve | Causa | Solución |
+|---|---|---|
+| "El servicio no está disponible en este momento" al registrarse o ingresar | El backend no tiene `DATABASE_URL` o no puede conectarse a Neon | Llena `DATABASE_URL` en `backend/.env` con la cadena de Neon → Connect y reinicia `npm run dev` |
+| `[bd] ✘ ... La contraseña de DATABASE_URL no es correcta` | Cambiaron la contraseña en Neon | Copia otra vez la cadena desde Neon → Connect |
+| "Thommy todavía no puede responder" | Falta `GROQ_API_KEY` | Crea la clave en https://console.groq.com/keys |
+| `Faltan migraciones` | La base de Neon está desactualizada | `npm run migrar` |
+
+`.env` siempre se lee de la carpeta `backend`, aunque el servidor se ejecute desde otra carpeta. Cada integrante necesita su propio `backend/.env`, porque ese archivo no se sube a GitHub. `GET /api/salud` muestra `baseDatos.estaConectada` (con el motivo si falla) e `ia.estaConfigurada`.
 
 ## Autenticación
 
@@ -204,10 +221,15 @@ src/
 pruebas/                    # Jest + supertest (la IA y la BD se simulan)
 ```
 
-## Despliegue en Render
+## Despliegue en Render (una sola dirección para todos)
 
-1. New → Web Service → conectar el repositorio.
-2. Root directory: `backend` · Build: `npm install` · Start: `npm start`.
-3. Variables de entorno: `DATABASE_URL`, `ORIGENES_PERMITIDOS`, `JWT_SECRETO`, `GROQ_API_KEY` y `ENTORNO=produccion`.
+El backend también sirve la app web (carpeta `frontend`). En Render queda **un solo servicio con una sola dirección**: los estudiantes, el docente y el equipo solo abren esa URL en Chrome, sin instalar nada ni configurar `.env`.
 
-El plan gratuito se duerme tras 15 minutos sin uso; abre `/api/salud` un minuto antes de una demo.
+El archivo `render.yaml` (en la raíz del repositorio) deja todo configurado:
+
+1. En https://dashboard.render.com: **New → Blueprint** → elegir el repositorio `talking-thommy`.
+2. Render pide dos valores: `DATABASE_URL` (la cadena de Neon) y `GROQ_API_KEY`. `JWT_SECRETO` se genera solo.
+3. **Apply**. Render instala, arranca y aplica las migraciones.
+4. La app queda en `https://<nombre-del-servicio>.onrender.com`. Para comprobarla: `/api/salud`.
+
+Solo se publican `index.html`, `css`, `js` y `assets` del frontend, nunca código ni configuración. El servidor usa el puerto que Render le asigna (`PORT`) y en producción no arranca sin `DATABASE_URL`. El plan gratuito se duerme tras 15 minutos sin uso: la primera visita tarda unos 30-50 segundos en despertar.

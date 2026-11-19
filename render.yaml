@@ -1,0 +1,26 @@
+# Despliegue en Render (Blueprint): un solo servicio con el backend y la app web.
+# En Render: New → Blueprint → elegir este repositorio. Pide DATABASE_URL y GROQ_API_KEY;
+# JWT_SECRETO se genera solo. Al arrancar, el servidor aplica las migraciones.
+# La app queda en https://<nombre-del-servicio>.onrender.com y la API en la misma dirección.
+services:
+  - type: web
+    name: talking-thommy
+    runtime: node
+    plan: free
+    branch: main
+    # Sin rootDir: el servidor necesita las carpetas backend y frontend
+    buildCommand: cd backend && npm ci --ignore-scripts
+    startCommand: cd backend && npm start
+    healthCheckPath: /api/salud
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: ENTORNO
+        value: produccion
+      - key: JWT_SECRETO
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false

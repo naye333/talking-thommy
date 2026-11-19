@@ -4,6 +4,10 @@
 
 Requiere Node.js 20 o superior. Para generar la app Android, también [Android Studio](https://developer.android.com/studio).
 
+## Dónde se usa
+
+En producción, el backend sirve esta app en la misma dirección que la API (Render). La app detecta sola la dirección de la API (`resolverUrlApi` en `js/config.js`): si la sirve el backend, usa esa misma dirección; con `npm run dev` (puerto 8081), usa `http://localhost:3000`.
+
 ## Desarrollo en el navegador
 
 ```bash

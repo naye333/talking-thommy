@@ -13,7 +13,8 @@
     "sembrar-syllabus": "node src/bd/sembrarSyllabus.js",
     "asignar-docente": "node src/bd/asignarDocente.js",
     "restablecer-contrasena": "node src/bd/restablecerContrasena.js",
-    "medir-calidad": "node src/herramientas/medirCalidad.js"
+    "medir-calidad": "node src/herramientas/medirCalidad.js",
+    "verificar": "node src/herramientas/verificarConfiguracion.js"
   },
   "engines": {
     "node": ">=20"
