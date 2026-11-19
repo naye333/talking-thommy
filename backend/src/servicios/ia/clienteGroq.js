@@ -3,6 +3,7 @@
 //  - completarJson: respuesta del tutor en formato JSON
 const entorno = require('../../config/entorno')
 const { crearError } = require('../../utilidades/errores')
+const estadoIa = require('./estadoIa')
 
 // Whisper deduce el formato por la extensión del archivo, así que la detectamos por los primeros bytes
 function detectarFormatoAudio (audio) {
@@ -24,7 +25,7 @@ function exigirClave () {
 function codigoSegunRespuesta (estado, detalle) {
   if (estado === 401 || estado === 403) return 'IA_CLAVE_INVALIDA'
   if (estado === 429) return 'IA_LIMITE_ALCANZADO'
-  if (estado === 404 || /model_(not_found|decommissioned)|does not exist|decommissioned/i.test(detalle)) return 'IA_MODELO_NO_DISPONIBLE'
+  if (estado === 404 || /model_not_found|decommissioned|does not exist/i.test(detalle)) return 'IA_MODELO_NO_DISPONIBLE'
   return 'IA_NO_DISPONIBLE'
 }
 
@@ -34,7 +35,7 @@ async function conReintentoDeModelo (llamar) {
     return await llamar()
   } catch (error) {
     if (error.codigo !== 'IA_MODELO_NO_DISPONIBLE') throw error
-    const estado = await require('./estadoIa').revisarIa({ forzar: true })
+    const estado = await estadoIa.revisarIa({ forzar: true })
     if (estado.estado !== 'ok') throw error
     return llamar()
   }

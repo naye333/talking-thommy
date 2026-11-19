@@ -53,22 +53,23 @@ async function avisarConfiguracion () {
 }
 
 // Comprueba Groq en segundo plano y deja en el registro si funciona y con qué modelos
-function avisarIa () {
-  if (!entorno.groqApiKey) return Promise.resolve()
-  return revisarIa().then((estado) => {
-    if (estado.estado === 'ok') {
-      console.log(`[ia] ✔ Groq listo (transcripción: ${estado.modelos.transcripcion}, tutor: ${estado.modelos.tutor})`)
-      if (estado.reemplazados) console.warn(`[ia] ! se reemplazaron modelos que Groq ya no ofrece: ${estado.reemplazados.join(', ')}`)
-    } else {
-      console.warn(`[ia] ✘ ${estado.mensaje}${estado.codigoHttp ? ` (HTTP ${estado.codigoHttp})` : ''}`)
-    }
-  }).catch(() => {})
+async function avisarIa () {
+  if (!entorno.groqApiKey) return
+  const estado = await revisarIa()
+  if (estado.estado === 'ok') {
+    console.log(`[ia] ✔ Groq listo (transcripción: ${estado.modelos.transcripcion}, tutor: ${estado.modelos.tutor})`)
+    if (estado.reemplazados) console.warn(`[ia] ! se reemplazaron modelos que Groq ya no ofrece: ${estado.reemplazados.join(', ')}`)
+  } else {
+    const codigo = estado.codigoHttp ? ` (HTTP ${estado.codigoHttp})` : ''
+    console.warn(`[ia] ✘ ${estado.mensaje}${codigo}`)
+  }
 }
 
 // Inicia el servidor y registra el apagado ordenado con Ctrl + C o la señal de Render
 async function arrancar (puerto) {
   await avisarConfiguracion()
-  avisarIa()
+  // En segundo plano: no retrasa el arranque si Groq tarda en responder
+  avisarIa().catch((error) => console.error('[ia] no se pudo revisar Groq:', error.message))
   const servidores = await iniciarServidor(puerto)
   const { port } = servidores.servidorHttp.address()
   console.log(`[servidor] REST en http://localhost:${port}/api`)

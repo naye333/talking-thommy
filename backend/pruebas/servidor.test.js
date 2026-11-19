@@ -96,3 +96,43 @@ describe('avisarConfiguracion', () => {
     expect(prepararBaseDatos).not.toHaveBeenCalled()
   })
 })
+
+describe('avisarIa', () => {
+  const entorno = require('../src/config/entorno')
+  const { avisarIa } = require('../src/servidor')
+  const { reiniciarEstadoIa } = require('../src/servicios/ia/estadoIa')
+  const clave = entorno.groqApiKey
+
+  beforeEach(() => {
+    reiniciarEstadoIa()
+    jest.spyOn(console, 'log').mockImplementation(() => {})
+    jest.spyOn(console, 'warn').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    entorno.groqApiKey = clave
+    reiniciarEstadoIa()
+    delete global.fetch
+    jest.restoreAllMocks()
+  })
+
+  test('sin clave no consulta a Groq', async () => {
+    entorno.groqApiKey = ''
+    global.fetch = jest.fn()
+    await avisarIa()
+    expect(global.fetch).not.toHaveBeenCalled()
+  })
+
+  test('informa si Groq está listo, si se reemplazó un modelo o si la clave no sirve', async () => {
+    entorno.groqApiKey = 'gsk_prueba'
+    global.fetch = jest.fn(async () => ({ ok: true, status: 200, json: async () => ({ data: [{ id: 'whisper-large-v3' }, { id: 'llama-3.3-70b-versatile' }] }) }))
+    await avisarIa()
+    expect(console.log.mock.calls.flat().join(' ')).toMatch(/Groq listo/)
+    expect(console.warn.mock.calls.flat().join(' ')).toMatch(/se reemplazaron modelos/)
+
+    reiniciarEstadoIa()
+    global.fetch = jest.fn(async () => ({ ok: false, status: 503 }))
+    await avisarIa()
+    expect(console.warn.mock.calls.flat().join(' ')).toMatch(/HTTP 503/)
+  })
+})

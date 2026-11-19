@@ -76,7 +76,9 @@ async function revisarIa ({ forzar = false } = {}) {
 
 // Para /api/salud: responde al instante con lo último que se sabe y actualiza en segundo plano
 function estadoIaReciente () {
-  if (!ultimo || Date.now() - ultimo.en >= VIGENCIA_MS) revisarIa().catch(() => {})
+  if (!ultimo || Date.now() - ultimo.en >= VIGENCIA_MS) {
+    revisarIa().catch((error) => console.error('[ia] no se pudo revisar Groq:', error.message))
+  }
   return ultimo ? ultimo.resultado : { estado: entorno.groqApiKey ? 'revisando' : 'sin_clave' }
 }
 
