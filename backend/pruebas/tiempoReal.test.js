@@ -1,5 +1,8 @@
 const WebSocket = require('ws')
 const { iniciarServidor, detenerServidor } = require('../src/servidor')
+const { generarToken } = require('../src/servicios/servicioAutenticacion')
+
+const token = generarToken({ id: 1, rol: 'estudiante', nivel: 1 })
 
 let servidores
 let urlBase
@@ -34,15 +37,27 @@ function conectar (query) {
 }
 
 describe('WebSocket /tiempo-real', () => {
+  test('rechaza conexiones sin token', async () => {
+    const { socket, recibir } = conectar('?sesion=abc')
+    expect((await recibir()).codigo).toBe('TOKEN_INVALIDO')
+    await new Promise((resolve) => socket.on('close', resolve))
+  })
+
+  test('rechaza conexiones con token falso', async () => {
+    const { socket, recibir } = conectar('?sesion=abc&token=falso')
+    expect((await recibir()).codigo).toBe('TOKEN_INVALIDO')
+    await new Promise((resolve) => socket.on('close', resolve))
+  })
+
   test('rechaza conexiones sin sesión', async () => {
-    const { socket, recibir } = conectar('')
+    const { socket, recibir } = conectar(`?token=${token}`)
     const mensaje = await recibir()
     expect(mensaje.codigo).toBe('SESION_REQUERIDA')
     await new Promise((resolve) => socket.on('close', resolve))
   })
 
   test('recibe un turno completo de audio', async () => {
-    const { socket, recibir } = conectar('?sesion=abc')
+    const { socket, recibir } = conectar(`?sesion=abc&token=${token}`)
 
     expect(await recibir()).toEqual({ tipo: 'conectado', sesionId: 'abc' })
 
@@ -60,7 +75,7 @@ describe('WebSocket /tiempo-real', () => {
   })
 
   test('reporta errores de protocolo', async () => {
-    const { socket, recibir } = conectar('?sesion=xyz')
+    const { socket, recibir } = conectar(`?sesion=xyz&token=${token}`)
     await recibir() // conectado
 
     socket.send(Buffer.alloc(10))
