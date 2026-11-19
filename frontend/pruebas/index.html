@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pruebas · Talking Thommy</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #0b170b; color: #f3f6ef; padding: 24px; }
+    .aprobada { color: #a6e35f; }
+    .fallida { color: #ff6b8a; }
+    pre { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Pruebas del frontend</h1>
+  <p id="resumen" data-estado="ejecutando">Ejecutando…</p>
+  <pre id="resultados"></pre>
+  <script type="module">
+    import { ejecutarPruebas } from './marco.js'
+    import './todas.js'
+
+    const resultados = await ejecutarPruebas()
+    const fallidas = resultados.filter((resultado) => !resultado.aprobada)
+    document.getElementById('resultados').innerHTML = resultados.map((resultado) => {
+      const clase = resultado.aprobada ? 'aprobada' : 'fallida'
+      const detalle = resultado.aprobada ? '' : `\n    ${resultado.error}`
+      return `<span class="${clase}">${resultado.aprobada ? '✔' : '✘'} ${resultado.nombre}${detalle}</span>`
+    }).join('\n')
+    const resumen = document.getElementById('resumen')
+    resumen.textContent = `${resultados.length - fallidas.length}/${resultados.length} pruebas aprobadas`
+    resumen.dataset.estado = fallidas.length > 0 ? 'fallo' : 'ok'
+  </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+/* =========================================================================
+   TOKENS DE DISEÑO · Talking Thommy
+   Colores, tipografía, espacios y radios compartidos por todos los perfiles.
+   ========================================================================= */
+:root {
+  /* Fondo */
+  --color-fondo: #081208;
+  --color-fondo-app: #0b170b;
+  --color-fondo-brillo: #1b3a17;
+  --color-hoja: #16341a;
+  --color-hoja-clara: #1f4a22;
+
+  /* Superficies (tarjetas) */
+  --color-superficie: rgba(30, 48, 28, 0.62);
+  --color-superficie-solida: #142313;
+  --color-superficie-elevada: rgba(42, 64, 38, 0.7);
+  --color-borde: rgba(146, 196, 112, 0.2);
+  --color-borde-fuerte: rgba(166, 227, 95, 0.55);
+
+  /* Marca */
+  --color-lima: #a6e35f;
+  --color-lima-claro: #c2f07e;
+  --color-lima-oscuro: #6fbf3a;
+  --color-sobre-lima: #0d1a09;
+  --degradado-lima: linear-gradient(180deg, #c3f17f 0%, #9fdc57 100%);
+
+  /* Texto */
+  --color-texto: #f3f6ef;
+  --color-texto-suave: #d0d8c9;
+  --color-texto-tenue: #95a38f;
+
+  /* Estados */
+  --color-peligro: #ff6b8a;
+  --color-peligro-fondo: #e8456b;
+  --color-alerta: #f7c43a;
+  --color-exito: #6fd04a;
+  --color-info: #5b8cf0;
+
+  /* Tipografía */
+  --fuente: 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --texto-xs: 0.75rem;   /* 12px */
+  --texto-sm: 0.875rem;  /* 14px */
+  --texto-md: 1rem;      /* 16px */
+  --texto-lg: 1.125rem;  /* 18px */
+  --texto-xl: 1.3125rem; /* 21px */
+  --texto-2xl: 1.625rem; /* 26px */
+  --texto-3xl: 2rem;     /* 32px */
+
+  /* Espacios */
+  --espacio-1: 4px;
+  --espacio-2: 8px;
+  --espacio-3: 12px;
+  --espacio-4: 16px;
+  --espacio-5: 20px;
+  --espacio-6: 24px;
+  --margen-pantalla: 18px;
+
+  /* Radios y sombras */
+  --radio-sm: 10px;
+  --radio-md: 14px;
+  --radio-lg: 18px;
+  --radio-pildora: 999px;
+  --sombra-tarjeta: 0 10px 24px rgba(0, 0, 0, 0.28);
+  --sombra-lima: 0 0 0 1px rgba(194, 240, 126, 0.35), 0 8px 22px rgba(140, 214, 72, 0.28);
+
+  /* Medidas de la app */
+  --ancho-app: 430px;
+  --alto-barra-navegacion: 64px;
+  --transicion: 160ms ease;
+}
