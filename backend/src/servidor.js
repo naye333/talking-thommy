@@ -5,6 +5,7 @@ const { crearServidorWebSocket } = require('./tiempo-real/manejadorWebSocket')
 const { cerrarPool, verificarConexion } = require('./config/baseDatos')
 const { revisarConfiguracion, formatearProblema, explicarErrorBaseDatos } = require('./config/diagnostico')
 const { prepararBaseDatos } = require('./bd/prepararBaseDatos')
+const { revisarIa } = require('./servicios/ia/estadoIa')
 
 // REST y WebSocket comparten el mismo puerto (necesario en Render)
 // opciones se pasa al WebSocket (permite reemplazar la IA y la BD en pruebas)
@@ -51,9 +52,24 @@ async function avisarConfiguracion () {
   }
 }
 
+// Comprueba Groq en segundo plano y deja en el registro si funciona y con qué modelos
+async function avisarIa () {
+  if (!entorno.groqApiKey) return
+  const estado = await revisarIa()
+  if (estado.estado === 'ok') {
+    console.log(`[ia] ✔ Groq listo (transcripción: ${estado.modelos.transcripcion}, tutor: ${estado.modelos.tutor})`)
+    if (estado.reemplazados) console.warn(`[ia] ! se reemplazaron modelos que Groq ya no ofrece: ${estado.reemplazados.join(', ')}`)
+  } else {
+    const codigo = estado.codigoHttp ? ` (HTTP ${estado.codigoHttp})` : ''
+    console.warn(`[ia] ✘ ${estado.mensaje}${codigo}`)
+  }
+}
+
 // Inicia el servidor y registra el apagado ordenado con Ctrl + C o la señal de Render
 async function arrancar (puerto) {
   await avisarConfiguracion()
+  // En segundo plano: no retrasa el arranque si Groq tarda en responder
+  avisarIa().catch((error) => console.error('[ia] no se pudo revisar Groq:', error.message))
   const servidores = await iniciarServidor(puerto)
   const { port } = servidores.servidorHttp.address()
   console.log(`[servidor] REST en http://localhost:${port}/api`)
@@ -79,4 +95,4 @@ if (require.main === module) {
   })
 }
 
-module.exports = { iniciarServidor, detenerServidor, arrancar, avisarConfiguracion }
+module.exports = { iniciarServidor, detenerServidor, arrancar, avisarConfiguracion, avisarIa }

@@ -52,9 +52,11 @@ Ejecuta primero `npm run verificar`: revisa toda la configuración y dice qué f
 | "El servicio no está disponible en este momento" al registrarse o ingresar | El backend no tiene `DATABASE_URL` o no puede conectarse a Neon | Llena `DATABASE_URL` en `backend/.env` con la cadena de Neon → Connect y reinicia `npm run dev` |
 | `[bd] ✘ ... La contraseña de DATABASE_URL no es correcta` | Cambiaron la contraseña en Neon | Copia otra vez la cadena desde Neon → Connect |
 | "Thommy todavía no puede responder" | Falta `GROQ_API_KEY` | Crea la clave en https://console.groq.com/keys |
+| "la clave de la IA no es válida" (`IA_CLAVE_INVALIDA`) | La clave fue eliminada o está mal copiada | Crea una nueva en Groq y actualízala (en Render: Environment → `GROQ_API_KEY` → Save) |
+| "el modelo de IA no está disponible" | Groq retiró el modelo y no hay otro compatible | Revisa los modelos en https://console.groq.com/docs/models y define `MODELO_TUTOR` o `MODELO_TRANSCRIPCION` |
 | `Faltan migraciones` | La base de Neon está desactualizada | `npm run migrar` |
 
-`.env` siempre se lee de la carpeta `backend`, aunque el servidor se ejecute desde otra carpeta. Cada integrante necesita su propio `backend/.env`, porque ese archivo no se sube a GitHub. `GET /api/salud` muestra `baseDatos.estaConectada` (con el motivo si falla) e `ia.estaConfigurada`.
+`.env` siempre se lee de la carpeta `backend`, aunque el servidor se ejecute desde otra carpeta. Cada integrante necesita su propio `backend/.env`, porque ese archivo no se sube a GitHub. `GET /api/salud` muestra `baseDatos.estaConectada` (con el motivo si falla) y el estado de la IA: `ia.estado` (`ok`, `clave_invalida`, `sin_modelo`, `sin_conexion`, `error_groq` o `sin_clave`), con un `mensaje` y los modelos en uso. Si Groq retira un modelo, el servidor elige otro disponible de la misma clase y lo indica en `ia.reemplazados`.
 
 ## Autenticación
 

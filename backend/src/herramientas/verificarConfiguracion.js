@@ -5,6 +5,7 @@ const path = require('path')
 const entorno = require('../config/entorno')
 const { obtenerPool, verificarConexion, cerrarPool } = require('../config/baseDatos')
 const { revisarConfiguracion, formatearProblema, explicarErrorBaseDatos } = require('../config/diagnostico')
+const { revisarIa } = require('../servicios/ia/estadoIa')
 
 const CARPETA_MIGRACIONES = path.join(__dirname, '..', 'bd', 'migraciones')
 
@@ -24,22 +25,6 @@ async function contar (pool, sql) {
     return Number((await pool.query(sql)).rows[0].total)
   } catch {
     return null
-  }
-}
-
-// Comprueba la clave de Groq con una consulta que no gasta cuota (lista de modelos)
-async function revisarGroq () {
-  if (!entorno.groqApiKey) return null
-  try {
-    const respuesta = await fetch(`${entorno.groqUrlBase}/models`, {
-      headers: { Authorization: `Bearer ${entorno.groqApiKey}` },
-      signal: AbortSignal.timeout(10000)
-    })
-    if (respuesta.ok) return { ok: true }
-    if (respuesta.status === 401) return { ok: false, mensaje: 'Groq rechazó la clave: revisa GROQ_API_KEY (debe empezar por gsk_).' }
-    return { ok: false, mensaje: `Groq respondió ${respuesta.status}. Intenta de nuevo en unos minutos.` }
-  } catch {
-    return { ok: false, mensaje: 'No se pudo contactar a Groq. Revisa la conexión a internet.' }
   }
 }
 
@@ -79,9 +64,11 @@ async function verificar ({ escribir = console.log } = {}) {
     }
   }
 
-  const groq = await revisarGroq()
-  if (groq?.ok) ok('Clave de Groq válida (Thommy puede escuchar y responder)')
-  else if (groq) fallo(groq.mensaje)
+  if (entorno.groqApiKey) {
+    const ia = await revisarIa({ forzar: true })
+    if (ia.estado === 'ok') ok(`Groq listo: Thommy puede escuchar y responder (modelos: ${ia.modelos.transcripcion} y ${ia.modelos.tutor})`)
+    else fallo(ia.mensaje)
+  }
 
   escribir(errores === 0 ? '\nTodo listo. Inicia el servidor con: npm run dev' : `\n${errores} problema(s) por resolver.`)
   return errores

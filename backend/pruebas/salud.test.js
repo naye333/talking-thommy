@@ -10,7 +10,7 @@ describe('GET /api/salud', () => {
     expect(respuesta.status).toBe(200)
     expect(respuesta.body.estado).toBe('ok')
     expect(respuesta.body.baseDatos).toHaveProperty('estaConectada')
-    expect(respuesta.body.ia).toEqual({ estaConfigurada: false })
+    expect(respuesta.body.ia).toEqual({ estaConfigurada: false, estado: 'sin_clave' })
   })
 
   test('sin DATABASE_URL reporta la base de datos como no conectada', async () => {
