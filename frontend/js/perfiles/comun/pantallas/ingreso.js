@@ -25,6 +25,7 @@ export function pantallaIngreso ({ contenedor, navegar }, app) {
       <form class="pantalla-acceso__formulario" novalidate>
         ${campoConIcono({ id: 'ingreso-correo', nombre: 'correo', etiqueta: 'Correo electrónico', tipo: 'email', iconoNombre: 'sobre', autocompletar: 'email' })}
         ${campoConIcono({ id: 'ingreso-contrasena', nombre: 'contrasena', etiqueta: 'Contraseña', tipo: 'password', iconoNombre: 'candado', autocompletar: 'current-password' })}
+        <a class="pantalla-acceso__olvido" href="#/recuperar">¿Olvidaste tu contraseña?</a>
         <p class="mensaje-error" role="alert" data-mensaje-general></p>
         <button class="boton-principal" type="submit">Iniciar sesión</button>
       </form>
