@@ -15,4 +15,15 @@ function crearLimiteIntentos ({ maximo = entorno.maxIntentosAuth } = {}) {
   })
 }
 
-module.exports = { crearLimiteIntentos }
+// Para pedir captchas: cuentan todas las peticiones, no solo las fallidas
+function crearLimitePeticiones ({ maximo = 60 } = {}) {
+  return rateLimit({
+    windowMs: VENTANA_MS,
+    limit: maximo,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    handler: (_request, response) => response.status(429).json({ error: 'DEMASIADOS_INTENTOS' })
+  })
+}
+
+module.exports = { crearLimiteIntentos, crearLimitePeticiones }

@@ -108,8 +108,12 @@ describe('sintetizadorPiper', () => {
     expect(uno.readUInt32LE(24)).toBe(Math.round(22050 * 1.25))
     expect(dos.readUInt32LE(24)).toBe(Math.round(22050 * 1.25))
     // Los WAV temporales se borran después de leerlos
-    await new Promise((resolve) => setImmediate(resolve))
-    expect(fs.readdirSync(carpeta).filter((archivo) => archivo.endsWith('.wav'))).toEqual([])
+    // El borrado es asíncrono: con muchas pruebas en paralelo puede tardar un poco más
+    const quedanWav = () => fs.readdirSync(carpeta).filter((archivo) => archivo.endsWith('.wav'))
+    for (let espera = 0; espera < 40 && quedanWav().length > 0; espera++) {
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+    expect(quedanWav()).toEqual([])
     sintetizador.detener()
   })
 

@@ -56,6 +56,63 @@
   text-decoration: underline;
 }
 
+/* ---------- ¿Olvidaste tu contraseña? ---------- */
+.pantalla-acceso__olvido {
+  align-self: flex-end;
+  margin: 2px 0 var(--espacio-1);
+  font-size: var(--texto-sm);
+  color: var(--color-lima);
+  text-decoration: underline;
+}
+
+.pantalla-acceso__mascota--chica {
+  width: min(36%, 140px);
+}
+
+.captcha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  margin: var(--espacio-2) 0 var(--espacio-1);
+}
+
+.captcha__titulo,
+.captcha__ayuda {
+  font-size: var(--texto-sm);
+  color: var(--color-texto-suave);
+}
+
+.captcha__ayuda {
+  margin: -4px 0 var(--espacio-1);
+}
+
+.captcha__fila {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+}
+
+.captcha__imagen {
+  width: 220px;
+  max-width: 100%;
+  height: 70px;
+  border-radius: var(--radio-md);
+  background: #f4f6fb;
+  border: 1px solid var(--color-borde);
+}
+
+.captcha__otra {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--color-borde-fuerte);
+  color: var(--color-lima);
+  font-size: 22px;
+}
+
 .selector-nivel {
   display: flex;
   flex-wrap: wrap;
