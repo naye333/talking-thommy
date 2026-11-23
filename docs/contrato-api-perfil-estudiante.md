@@ -59,30 +59,31 @@ Para cancelar un turno el cliente no envía nada: el siguiente `inicio_turno` de
     ]
   },
   "respuesta": {
-    "texto": "Well done! Now try this one:",   // intervención del tutor, en inglés
-    "frase": "I am friendly and funny.",       // siguiente frase a practicar (opcional)
-    "audioUrl": null                           // opcional: audio del tutor; si falta, el frontend usa la voz del dispositivo
+    "texto": "Oh, you are from Bogota! Do you like it?",  // lo que dice Thommy, en inglés (conversación sobre el tema)
+    "frase": null,                                         // ya no se usa: Thommy conversa, no pide frases para repetir
+    "audioUrl": "/api/voz/3f2c…"                           // voz de Thommy (Piper); null si el servidor no tiene Piper
   }
 }
 ```
 
 Mientras el backend responda `turno_recibido`, el frontend en modo `tiempoReal` muestra "Thommy todavía no puede responder" (`TUTOR_NO_DISPONIBLE`).
 
-### Audio del tutor (`respuesta.audioUrl`) · ⚠️ pendiente de acordar
+### Voz de Thommy (`audioUrl`)
 
-**Lo que ya hace el frontend** (`js/servicios/estudiante/voz.js`): al tocar 🔊 en un mensaje de Thommy, reproduce `audioUrl` si existe; si falta, no carga o el dispositivo bloquea la reproducción, lee el texto con la voz del dispositivo. Acepta URLs absolutas o relativas a `urlApi` y solo `http`/`https`.
+El servidor genera la voz de niño de Thommy con **Piper** (texto a voz libre, en el propio servidor) y la entrega en `GET /api/voz/:id`:
 
-**Falta acordar con backend (Gabriela) e IA (Alisson)** y dejarlo escrito aquí:
+| Tema | Decisión |
+|---|---|
+| Formato | WAV PCM 16 bits mono (voz `en_US-kristin-medium` con el tono subido 1.28×). Unos 56 KB por segundo de voz. |
+| Tipo de URL | Relativa a la API (`/api/voz/<uuid>`), sin token: el `<audio>` no puede enviar `Authorization`. El id es aleatorio y vence a los 10 minutos. |
+| Cuándo está listo | La respuesta del turno llega sin esperar el audio; el `GET` espera a que Piper termine. Si Piper falla responde `503` y la app usa la voz del dispositivo. |
+| Contenido | El audio lee `texto` (ya no hay `frase`). |
+| Saludo | `saludo` de `POST /api/sesiones` también trae `audioUrl`. |
+| Sin Piper | `audioUrl` es `null` y la app usa la voz del dispositivo. `GET /api/salud` → `voz.motor` dice `piper` o `navegador`. |
 
-| Tema | Pregunta | Por qué importa en el frontend |
-|---|---|---|
-| Formato | ¿MP3, WAV, OGG/Opus? ¿Tamaño o duración máxima? | Debe reproducirse en Chrome y en el WebView de Android (iOS no reproduce OGG). |
-| Protocolo | ¿Siempre `https`? | La app Android se sirve como `https://localhost`: un audio `http` se bloquea por contenido mixto. |
-| Tipo de URL | ¿Absoluta (almacenamiento externo) o relativa a la API? ¿Pública o firmada y temporal? ¿Cuánto tiempo es válida? | El elemento `<audio>` **no puede enviar** `Authorization: Bearer`; si el audio exige el token, no se podrá reproducir. Una URL vencida cae a la voz del dispositivo. |
-| Contenido | ¿El audio lee `texto` + `frase` juntos, como hoy la voz del dispositivo? | Para que ambas opciones digan lo mismo. |
-| Saludo | ¿`saludo` de `POST /api/sesiones` también tendrá `audioUrl`? | El frontend ya lo soportaría sin cambios. |
+**Lo que hace el frontend** (`js/servicios/estudiante/voz.js` y la pantalla de conversación): Thommy **habla solo** al saludar y en cada respuesta, sin tocar 🔊 (el botón queda para volver a escucharlo). Si `audioUrl` falta, no carga o el dispositivo bloquea la reproducción, lee el texto con la voz del dispositivo.
 
-**Pendiente de validación:** la reproducción con un audio real del servidor no se ha probado; solo hay pruebas con un audio simulado y una prueba en Chrome de la caída a la voz del dispositivo (audio inexistente, 404). Se validará cuando backend e IA tengan la integración disponible, en navegador y en un celular Android.
+**Probado:** en Chrome con el servidor local, el saludo se reproduce solo con la voz de Piper. **Falta probar** en un celular Android (el WebView puede exigir un toque antes de reproducir audio).
 
 Errores que el frontend ya traduce: `TOKEN_INVALIDO`, `SESION_REQUERIDA`, `AUDIO_VACIO`, `AUDIO_DEMASIADO_GRANDE`, `TURNO_NO_INICIADO`, `ERROR_PROCESAMIENTO`.
 

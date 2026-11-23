@@ -37,7 +37,7 @@ async function medirCaso (carpeta, caso, conTutor) {
   let latenciaTutorMs = null
   if (conTutor) {
     const inicioTutor = Date.now()
-    await responderTurno({ tema: null, nivel: 1, transcripcion: transcripcion.texto, fraseObjetivo: caso.texto })
+    await responderTurno({ tema: null, nivel: 1, transcripcion: transcripcion.texto })
     latenciaTutorMs = Date.now() - inicioTutor
   }
 

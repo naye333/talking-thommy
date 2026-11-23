@@ -2,6 +2,7 @@ const path = require('path')
 
 // Siempre se lee backend/.env, sin importar desde qué carpeta se ejecute el servidor
 const RUTA_ENV = path.join(__dirname, '..', '..', '.env')
+const CARPETA_PIPER = path.join(__dirname, '..', '..', 'vendor', 'piper')
 require('dotenv').config({ path: RUTA_ENV, quiet: true })
 
 const nombreEntorno = process.env.ENTORNO || 'desarrollo'
@@ -39,7 +40,15 @@ const entorno = {
   modeloTranscripcion: process.env.MODELO_TRANSCRIPCION || 'whisper-large-v3-turbo',
   modeloTutor: process.env.MODELO_TUTOR || 'llama-3.3-70b-versatile',
   tiempoMaximoIaMs: Number(process.env.TIEMPO_MAXIMO_IA_MS) || 20000,
-  maxTurnosHistorial: Number(process.env.MAX_TURNOS_HISTORIAL) || 6
+  maxTurnosHistorial: Number(process.env.MAX_TURNOS_HISTORIAL) || 6,
+
+  // Voz de Thommy con Piper. Por defecto se busca lo que instala scripts/instalar-piper.sh en backend/vendor/piper.
+  // Si no está, la app usa la voz del dispositivo.
+  piperBinario: process.env.PIPER_BINARIO || path.join(CARPETA_PIPER, 'piper', process.platform === 'win32' ? 'piper.exe' : 'piper'),
+  piperModelo: process.env.PIPER_MODELO || path.join(CARPETA_PIPER, 'en_US-kristin-medium.onnx'),
+  // Tono > 1 hace la voz más aguda (de niño) sin cambiar la velocidad
+  piperTono: Number(process.env.PIPER_TONO) || 1.28,
+  piperVelocidad: Number(process.env.PIPER_VELOCIDAD) || 1.0
 }
 
 module.exports = entorno

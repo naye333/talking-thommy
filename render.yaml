@@ -9,7 +9,8 @@ services:
     plan: free
     branch: main
     # Sin rootDir: el servidor necesita las carpetas backend y frontend
-    buildCommand: cd backend && npm ci --ignore-scripts
+    # instalar-piper.sh descarga la voz de niño de Thommy (Piper); si falla, la app usa la voz del dispositivo
+    buildCommand: cd backend && npm ci --ignore-scripts && bash scripts/instalar-piper.sh
     startCommand: cd backend && npm start
     healthCheckPath: /api/salud
     autoDeploy: true

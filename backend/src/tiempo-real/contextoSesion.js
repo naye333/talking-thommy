@@ -1,6 +1,7 @@
 // Carga lo que el turno necesita saber de la sesión y verifica que pertenece al estudiante
 const repositorioPractica = require('../repositorios/repositorioPractica')
 const repositorioSyllabus = require('../repositorios/repositorioSyllabus')
+const { construirSaludo } = require('../servicios/servicioTutor')
 const { crearError } = require('../utilidades/errores')
 
 async function cargarContextoSesion (usuario, sesionIdTexto) {
@@ -14,11 +15,8 @@ async function cargarContextoSesion (usuario, sesionIdTexto) {
   if (!sesion || sesion.estudianteId !== usuario.id) throw crearError(404, 'SESION_NO_ENCONTRADA')
 
   const tema = sesion.temaId ? await repositorioSyllabus.buscarTemaPorId(sesion.temaId) : null
-  // Si el estudiante se reconecta, se retoma la última frase que propuso Thommy
-  const [ultimoTurno] = await repositorioPractica.listarUltimosTurnos(sesion.id, 1)
-  const fraseActual = ultimoTurno ? ultimoTurno.fraseSiguiente : sesion.fraseInicial
-
-  return { sesion, tema, nivel: usuario.nivel, fraseActual }
+  // El saludo se reconstruye igual que al crear la sesión: es la pregunta con la que abrió Thommy
+  return { sesion, tema, nivel: usuario.nivel, saludo: construirSaludo(tema).texto }
 }
 
 module.exports = { cargarContextoSesion }

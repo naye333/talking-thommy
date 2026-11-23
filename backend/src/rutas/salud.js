@@ -3,6 +3,7 @@ const { verificarConexion } = require('../config/baseDatos')
 const entorno = require('../config/entorno')
 const { explicarErrorBaseDatos } = require('../config/diagnostico')
 const { estadoIaReciente } = require('../servicios/ia/estadoIa')
+const { servicioVoz } = require('../servicios/voz/servicioVoz')
 
 const rutasSalud = Router()
 
@@ -16,7 +17,8 @@ rutasSalud.get('/', async (_request, response) => {
     servicio: 'talking-thommy-backend',
     marcaTiempo: new Date().toISOString(),
     baseDatos,
-    ia: { estaConfigurada: Boolean(entorno.groqApiKey), ...estadoIaReciente() }
+    ia: { estaConfigurada: Boolean(entorno.groqApiKey), ...estadoIaReciente() },
+    voz: servicioVoz.estado()
   })
 })
 
