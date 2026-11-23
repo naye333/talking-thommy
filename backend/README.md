@@ -68,8 +68,11 @@ El registro público crea solo **estudiantes**. Las cuentas de docente se crean 
 | POST | `/api/auth/ingreso` | `{ correo, contrasena }` | `200 { token, usuario }` |
 | GET | `/api/auth/yo` | — (encabezado `Authorization: Bearer <token>`) | `200 { usuario }` |
 | PATCH | `/api/auth/contrasena` | `{ contrasenaActual, contrasenaNueva }` | `204` |
+| GET | `/api/auth/captcha` | — | `200 { captchaId, imagen }` (imagen SVG en data URL, un solo uso, vence en 5 min) |
+| POST | `/api/auth/recuperar/verificar` | `{ correo, codigoGrupo, captchaId, captchaRespuesta }` | `200 { tokenRecuperacion, nombre }` (permiso de un solo uso, vence en 10 min) |
+| POST | `/api/auth/recuperar/cambiar` | `{ tokenRecuperacion, contrasenaNueva }` | `204` |
 
-Códigos de error: `DATOS_INVALIDOS` (400, con `detalles` por campo), `JSON_INVALIDO` (400), `CONTRASENA_INCORRECTA` (400), `CODIGO_GRUPO_INVALIDO` (400), `CREDENCIALES_INVALIDAS` (401), `TOKEN_REQUERIDO` (401), `TOKEN_INVALIDO` (401), `PERMISO_DENEGADO` (403), `USUARIO_NO_ENCONTRADO` (404), `CORREO_EN_USO` (409), `DEMASIADOS_INTENTOS` (429), `BASE_DATOS_NO_DISPONIBLE` (503).
+Códigos de error: `DATOS_INVALIDOS` (400, con `detalles` por campo), `JSON_INVALIDO` (400), `CONTRASENA_INCORRECTA` (400), `CODIGO_GRUPO_INVALIDO` (400), `CAPTCHA_INCORRECTO` (400), `VERIFICACION_FALLIDA` (400), `RECUPERACION_VENCIDA` (400), `CREDENCIALES_INVALIDAS` (401), `TOKEN_REQUERIDO` (401), `TOKEN_INVALIDO` (401), `PERMISO_DENEGADO` (403), `USUARIO_NO_ENCONTRADO` (404), `CORREO_EN_USO` (409), `DEMASIADOS_INTENTOS` (429), `BASE_DATOS_NO_DISPONIBLE` (503).
 
 **Límite de intentos:** registro, ingreso y cambio de contraseña aceptan 10 intentos **fallidos** por IP cada 15 minutos (`MAX_INTENTOS_AUTH`). Los intentos exitosos no cuentan.
 

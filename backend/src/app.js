@@ -26,7 +26,8 @@ function servirAppWeb (app) {
   }
 }
 
-function crearApp () {
+// opciones.captcha permite a las pruebas conocer la respuesta del captcha
+function crearApp (opciones = {}) {
   const app = express()
   // Render pone un proxy delante: así el límite de intentos ve la IP real del cliente
   app.set('trust proxy', 1)
@@ -50,7 +51,7 @@ function crearApp () {
 
   servirAppWeb(app)
   app.use('/api/salud', rutasSalud)
-  app.use('/api/auth', crearRutasAutenticacion())
+  app.use('/api/auth', crearRutasAutenticacion({ captcha: opciones.captcha }))
   app.use('/api/syllabus', rutasSyllabus)
   app.use('/api/sesiones', rutasSesiones)
   app.use('/api/estudiante', rutasEstudiante)

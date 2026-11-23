@@ -128,6 +128,18 @@ async function obtenerCodigoGrupo (docenteId) {
   return rows[0]?.codigo_grupo || null
 }
 
+// Código de la clase de una cuenta: el del docente del estudiante, o el propio si es docente
+async function obtenerCodigoClaseDeUsuario (usuarioId) {
+  const { rows } = await obtenerPoolObligatorio().query(
+    `SELECT CASE WHEN u.rol = 'docente' THEN u.codigo_grupo ELSE d.codigo_grupo END AS codigo
+       FROM usuarios u
+       LEFT JOIN usuarios d ON d.id = u.docente_id AND d.rol = 'docente'
+      WHERE u.id = $1`,
+    [usuarioId]
+  )
+  return rows[0]?.codigo || null
+}
+
 // Devuelve el código guardado; lanza CODIGO_EN_USO si otro docente ya lo tiene
 async function actualizarCodigoGrupo (docenteId, codigo) {
   try {
@@ -157,5 +169,6 @@ module.exports = {
   asignarDocentePorId,
   buscarDocentePorCodigo,
   obtenerCodigoGrupo,
+  obtenerCodigoClaseDeUsuario,
   actualizarCodigoGrupo
 }

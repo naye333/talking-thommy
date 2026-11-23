@@ -71,4 +71,44 @@ function validarIngreso (cuerpo = {}) {
   return { errores, datos: { correo, contrasena: cuerpo.contrasena } }
 }
 
-module.exports = { validarRegistro, validarIngreso, validarCambioContrasena }
+// Paso 1 de "olvidé mi contraseña": correo, código de la clase y captcha
+function validarVerificacionRecuperacion (cuerpo = {}) {
+  const errores = []
+  const correo = typeof cuerpo.correo === 'string' ? cuerpo.correo.trim().toLowerCase() : ''
+  if (!EXPRESION_CORREO.test(correo)) errores.push({ campo: 'correo', mensaje: 'Correo no válido' })
+  if (!esTextoConContenido(cuerpo.codigoGrupo) || cuerpo.codigoGrupo.trim().length > 20) {
+    errores.push({ campo: 'codigoGrupo', mensaje: 'Escribe el código de tu clase' })
+  }
+  if (!esTextoConContenido(cuerpo.captchaId) || cuerpo.captchaId.length > 100) {
+    errores.push({ campo: 'captchaRespuesta', mensaje: 'Carga un nuevo captcha' })
+  } else if (!esTextoConContenido(cuerpo.captchaRespuesta) || cuerpo.captchaRespuesta.length > 20) {
+    errores.push({ campo: 'captchaRespuesta', mensaje: 'Escribe las letras de la imagen' })
+  }
+  return {
+    errores,
+    datos: { correo, codigoGrupo: cuerpo.codigoGrupo, captchaId: cuerpo.captchaId, captchaRespuesta: cuerpo.captchaRespuesta }
+  }
+}
+
+// Paso 2: el permiso del paso 1 y la contraseña nueva
+function validarCambioRecuperacion (cuerpo = {}) {
+  const errores = []
+  if (!esTextoConContenido(cuerpo.tokenRecuperacion) || cuerpo.tokenRecuperacion.length > 100) {
+    errores.push({ campo: 'tokenRecuperacion', mensaje: 'Falta el permiso de recuperación' })
+  }
+  const nueva = cuerpo.contrasenaNueva
+  if (typeof nueva !== 'string' || nueva.length < MIN_CONTRASENA) {
+    errores.push({ campo: 'contrasenaNueva', mensaje: `Mínimo ${MIN_CONTRASENA} caracteres` })
+  } else if (nueva.length > MAX_CONTRASENA) {
+    errores.push({ campo: 'contrasenaNueva', mensaje: `Máximo ${MAX_CONTRASENA} caracteres` })
+  }
+  return { errores, datos: { tokenRecuperacion: cuerpo.tokenRecuperacion, contrasenaNueva: nueva } }
+}
+
+module.exports = {
+  validarRegistro,
+  validarIngreso,
+  validarCambioContrasena,
+  validarVerificacionRecuperacion,
+  validarCambioRecuperacion
+}
