@@ -1,0 +1,18 @@
+# Entorno y configuración local
+.venv/
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Modelos y binarios (se descargan con scripts/setup.ps1)
+models/ollama/
+models/whisper/*.bin
+models/piper/*.onnx
+models/piper/*.onnx.json
+bin/
+
+# Datos generados en ejecución
+storage/
+logs/
+tests/fixtures/student_sentence.*
