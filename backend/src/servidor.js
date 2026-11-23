@@ -6,6 +6,7 @@ const { cerrarPool, verificarConexion } = require('./config/baseDatos')
 const { revisarConfiguracion, formatearProblema, explicarErrorBaseDatos } = require('./config/diagnostico')
 const { prepararBaseDatos } = require('./bd/prepararBaseDatos')
 const { revisarIa } = require('./servicios/ia/estadoIa')
+const { servicioVoz } = require('./servicios/voz/servicioVoz')
 
 // REST y WebSocket comparten el mismo puerto (necesario en Render)
 // opciones se pasa al WebSocket (permite reemplazar la IA y la BD en pruebas)
@@ -24,6 +25,7 @@ async function detenerServidor ({ servidorHttp, servidorWs }) {
   servidorWs.clients.forEach((socket) => socket.terminate())
   await new Promise((resolve) => servidorWs.close(resolve))
   await new Promise((resolve) => servidorHttp.close(resolve))
+  servicioVoz.detener()
   await cerrarPool()
 }
 
@@ -70,6 +72,12 @@ async function arrancar (puerto) {
   await avisarConfiguracion()
   // En segundo plano: no retrasa el arranque si Groq tarda en responder
   avisarIa().catch((error) => console.error('[ia] no se pudo revisar Groq:', error.message))
+  // Carga la voz de Piper en segundo plano para que el primer saludo no espere
+  if (servicioVoz.estaDisponible) {
+    servicioVoz.precalentar().then((lista) => { if (lista) console.log('[voz] ✔ Piper listo (voz de niño)') })
+  } else {
+    console.log('[voz] Piper no está instalado: la app usará la voz del dispositivo')
+  }
   const servidores = await iniciarServidor(puerto)
   const { port } = servidores.servidorHttp.address()
   console.log(`[servidor] REST en http://localhost:${port}/api`)

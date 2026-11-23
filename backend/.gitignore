@@ -1,5 +1,7 @@
 node_modules/
 coverage/
 .env
+# Piper y la voz de Thommy (los descarga scripts/instalar-piper.sh)
+vendor/
 *.log
 .DS_Store

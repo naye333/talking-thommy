@@ -10,6 +10,7 @@ const rutasSyllabus = require('./rutas/syllabus')
 const rutasSesiones = require('./rutas/sesiones')
 const rutasEstudiante = require('./rutas/estudiante')
 const rutasDocente = require('./rutas/docente')
+const { crearRutasVoz } = require('./rutas/voz')
 
 // La app web (carpeta frontend) se sirve desde el mismo servidor: así en Render hay una sola
 // dirección para todos. Solo se publican los archivos de la app, nunca código ni configuración.
@@ -54,6 +55,7 @@ function crearApp () {
   app.use('/api/sesiones', rutasSesiones)
   app.use('/api/estudiante', rutasEstudiante)
   app.use('/api/docente', rutasDocente)
+  app.use('/api/voz', crearRutasVoz())
 
   // Ruta no encontrada
   app.use((_request, response) => {
