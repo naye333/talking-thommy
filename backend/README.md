@@ -148,12 +148,14 @@ Conexión: `/tiempo-real?sesion=<id>&token=<jwt>`. El token debe ser de un estud
         "sugerencia": "Se escuchó \"intro\". En \"introduce\" cuida la vocal de \"cup\": una \"a\" corta y relajada." }
     ]
   },
-  "respuesta": { "texto": "Nice! Now say this:", "frase": "I am friendly and funny.", "audioUrl": null },
+  "respuesta": { "texto": "Nice to meet you! Where are you from?", "frase": null, "audioUrl": "/api/voz/3f2c…" },
   "latenciaMs": 2300
 }
 ```
 
-`audioUrl` siempre es `null` por ahora: el frontend usa la voz del dispositivo (el formato del audio del tutor está pendiente de acordar).
+Thommy **conversa** sobre el tema del syllabus: reacciona a lo que dijo el estudiante, corrige con naturalidad dentro de su respuesta y hace una pregunta nueva. Ya no propone frases para repetir (`frase` siempre es `null`); la pronunciación se compara contra la versión corregida de lo que dijo el estudiante.
+
+`audioUrl` es la voz de niño de Thommy generada con **Piper** en el servidor (WAV, `GET /api/voz/:id`, sin token, vence a los 10 minutos). En Render la instala `scripts/instalar-piper.sh` durante el despliegue. Si Piper no está, `audioUrl` es `null` y la app usa la voz del dispositivo. Para probarla en local con Windows, pon en `.env` `PIPER_BINARIO` y `PIPER_MODELO` (ver `.env.example`).
 
 Códigos de error: `TOKEN_INVALIDO`, `SESION_REQUERIDA`, `SESION_NO_ENCONTRADA`, `PERMISO_DENEGADO`, `JSON_INVALIDO`, `TIPO_DESCONOCIDO`, `TURNO_NO_INICIADO`, `TURNO_EN_PROCESO`, `AUDIO_VACIO`, `AUDIO_DEMASIADO_GRANDE`, `FORMATO_AUDIO_NO_SOPORTADO`, `TRANSCRIPCION_VACIA`, `TUTOR_NO_DISPONIBLE` (falta `GROQ_API_KEY`), `IA_NO_DISPONIBLE`, `IA_TIEMPO_AGOTADO`, `IA_LIMITE_ALCANZADO`, `IA_RESPUESTA_INVALIDA`, `ERROR_PROCESAMIENTO`.
 

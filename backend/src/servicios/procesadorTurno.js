@@ -2,14 +2,15 @@
 const entorno = require('../config/entorno')
 const clienteGroq = require('./ia/clienteGroq')
 const servicioTutor = require('./servicioTutor')
+const { servicioVoz } = require('./voz/servicioVoz')
 const repositorioPractica = require('../repositorios/repositorioPractica')
 const { compararPronunciacion } = require('./analisisFonetico')
 const { calcularFluidez, construirEvaluacion } = require('./servicioEvaluacion')
 const { crearError } = require('../utilidades/errores')
 
 // Las dependencias se inyectan para poder probar el flujo sin red ni base de datos
-function crearProcesadorTurno ({ ia = clienteGroq, tutor = servicioTutor, repositorio = repositorioPractica } = {}) {
-  // contexto: { sesion, tema, nivel, fraseActual } (fraseActual se actualiza tras cada turno)
+function crearProcesadorTurno ({ ia = clienteGroq, tutor = servicioTutor, repositorio = repositorioPractica, voz = servicioVoz } = {}) {
+  // contexto: { sesion, tema, nivel, saludo } (saludo: lo primero que dijo Thommy en la sesión)
   return async function procesarTurno (audio, contexto) {
     const inicio = Date.now()
     const transcripcion = await ia.transcribirAudio(audio)
@@ -21,11 +22,11 @@ function crearProcesadorTurno ({ ia = clienteGroq, tutor = servicioTutor, reposi
       nivel: contexto.nivel,
       historial,
       transcripcion: transcripcion.texto,
-      fraseObjetivo: contexto.fraseActual
+      saludo: contexto.saludo
     }, ia)
 
-    // Con frase propuesta se compara contra ella; en conversación libre, contra la versión corregida
-    const referencia = contexto.fraseActual || respuestaTutor.correccion
+    // En conversación no hay frase para repetir: se compara contra la versión corregida de lo que dijo
+    const referencia = respuestaTutor.correccion
     const pronunciacion = compararPronunciacion(referencia, transcripcion.texto)
     const evaluacion = construirEvaluacion({ pronunciacion, errores: respuestaTutor.errores })
     const latenciaMs = Date.now() - inicio
@@ -52,12 +53,12 @@ function crearProcesadorTurno ({ ia = clienteGroq, tutor = servicioTutor, reposi
       console.error('[turno] no se pudo guardar el resultado:', error.message)
     }
 
-    contexto.fraseActual = respuestaTutor.frase
     return {
       tipo: 'resultado_turno',
       transcripcion: transcripcion.texto,
       evaluacion,
-      respuesta: { texto: respuestaTutor.respuesta, frase: respuestaTutor.frase, audioUrl: null },
+      // El audio se genera en segundo plano: la app lo descarga de audioUrl (null si no hay Piper)
+      respuesta: { texto: respuestaTutor.respuesta, frase: null, audioUrl: voz.prepararAudio(respuestaTutor.respuesta) },
       latenciaMs
     }
   }

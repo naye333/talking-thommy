@@ -3,7 +3,7 @@ const request = require('supertest')
 
 jest.mock('../src/repositorios/repositorioSyllabus', () => ({
   buscarTemaPorId: async (id) => id === 3
-    ? { id: 3, titulo: 'Introducing yourself', frasesModelo: ['Hi, let me introduce myself.'] }
+    ? { id: 3, titulo: 'Introducing yourself', frasesModelo: ['Hi, let me introduce myself.', 'Where are you from?'] }
     : null
 }))
 
@@ -19,6 +19,10 @@ jest.mock('../src/repositorios/repositorioPractica', () => ({
     palabras: [],
     errores: []
   }])
+}))
+
+jest.mock('../src/servicios/voz/servicioVoz', () => ({
+  servicioVoz: { prepararAudio: jest.fn(() => '/api/voz/saludo'), estado: () => ({ estaConfigurada: false }) }
 }))
 
 const repositorioPractica = require('../src/repositorios/repositorioPractica')
@@ -39,11 +43,12 @@ describe('POST /api/sesiones', () => {
     expect(respuesta.body).toEqual({
       sesion: { id: 11, temaId: 3 },
       saludo: {
-        texto: 'Hi! I\'m Thommy. Today we will practice "Introducing yourself". Try saying this:',
-        frase: 'Hi, let me introduce myself.'
+        texto: 'Hi! I\'m Thommy. Today let\'s talk about "Introducing yourself". Where are you from?',
+        frase: null,
+        audioUrl: '/api/voz/saludo'
       }
     })
-    expect(repositorioPractica.crearSesion).toHaveBeenCalledWith({ estudianteId: 1, temaId: 3, fraseInicial: 'Hi, let me introduce myself.' })
+    expect(repositorioPractica.crearSesion).toHaveBeenCalledWith({ estudianteId: 1, temaId: 3, fraseInicial: null })
   })
 
   test('sin tema es conversación libre', async () => {
@@ -85,14 +90,9 @@ describe('GET /api/estudiante/progreso', () => {
 })
 
 describe('cargarContextoSesion', () => {
-  test('carga la sesión, el tema y la frase actual', async () => {
+  test('carga la sesión, el tema y el saludo con que abrió Thommy', async () => {
     const contexto = await cargarContextoSesion(estudiante, '11')
-    expect(contexto).toMatchObject({ sesion: { id: 11 }, tema: { id: 3 }, nivel: 1, fraseActual: 'Hi, let me introduce myself.' })
-  })
-
-  test('al reconectarse retoma la última frase propuesta', async () => {
-    repositorioPractica.listarUltimosTurnos.mockResolvedValueOnce([{ fraseSiguiente: 'Nice to meet you.' }])
-    expect((await cargarContextoSesion(estudiante, '11')).fraseActual).toBe('Nice to meet you.')
+    expect(contexto).toMatchObject({ sesion: { id: 11 }, tema: { id: 3 }, nivel: 1, saludo: expect.stringMatching(/Where are you from\?$/) })
   })
 
   test('rechaza sesiones ajenas, inválidas y docentes', async () => {

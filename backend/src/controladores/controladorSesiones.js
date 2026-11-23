@@ -1,6 +1,7 @@
 const repositorioPractica = require('../repositorios/repositorioPractica')
 const repositorioSyllabus = require('../repositorios/repositorioSyllabus')
 const { construirSaludo } = require('../servicios/servicioTutor')
+const { servicioVoz } = require('../servicios/voz/servicioVoz')
 const { crearError } = require('../utilidades/errores')
 
 // POST /api/sesiones { temaId } → crea la sesión de práctica y devuelve el saludo de Thommy
@@ -23,7 +24,8 @@ async function crearSesion (request, response, next) {
       temaId: tema ? tema.id : null,
       fraseInicial: saludo.frase
     })
-    response.status(201).json({ sesion: { id: sesion.id, temaId: sesion.temaId }, saludo })
+    // El audio del saludo se genera mientras la app abre el WebSocket
+    response.status(201).json({ sesion: { id: sesion.id, temaId: sesion.temaId }, saludo: { ...saludo, audioUrl: servicioVoz.prepararAudio(saludo.texto) } })
   } catch (error) {
     next(error)
   }
